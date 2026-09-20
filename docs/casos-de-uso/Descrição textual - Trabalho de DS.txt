@@ -1,0 +1,49 @@
+﻿Sistema de gestão interna da ONG Alimentar
+Projeto da disciplina de Desenvolvimento de Softwares
+
+
+Grupo 1: Eduarda Pereira Medeiros, Charllynson Carvalho Caxias, Gustavo 
+Cunha Kneip, Victor Matheus Reiznautt da Gama, João Vitor Montanher Lago
+
+
+
+
+1. Contextualização
+        A ONG Alimentar é uma organização sem fins lucrativos que visa garantir direitos de pessoas em situação de vulnerabilidade social e de situação de rua na cidade de Pelotas/RS. Entre os serviços gratuitos oferecidos pela entidade privada, estão a confecção e distribuição de marmitas para a população vulnerável; atendimento social, psicológico e médico; orientação jurídica; doação de cestas básicas e de roupas; empréstimo de materiais hospitalares e internação de adictos em comunidades terapêuticas.
+        A equipe de trabalho da organização é composta por voluntários e pela assistente social, responsável pela elaboração de projetos, cadastros de famílias e registro das atividades realizadas. Considerando a ocorrência frequente de recebimento de recursos financeiros através de editais e de doações de empresas ou pessoas físicas, torna-se primordial a organização da documentação necessária para a prestação de contas. Além de recibos e notas fiscais, o cadastro de pessoas atendidas e de doações destinadas são exigidos para comprovar o funcionamento regular da ONG.        
+        Até o presente momento, grande parte das atividades da ONG são registradas somente no papel. Esse fato dificulta a busca por informações específicas e exige o armazenamento de pilhas de papéis, o que afeta a eficiência dos serviços prestados e demanda gastos extras com impressões. A criação de um sistema dedicado à gestão interna da Alimentar permite unir todos os dados mais importantes relacionados ao trabalho da instituição em um único lugar, possibilitando o acesso remoto e a fácil conexão entre o uso de diferentes serviços pelas pessoas assistidas.
+
+
+2. Usuários do sistema
+        O usuário principal do sistema é a assistente social da organização, responsável por realizar os cadastros das famílias atendidas e a atualização regular da situação dos projetos em andamento. 
+Adicionalmente, deve ser permitido o acesso de voluntários para o controle de serviços específicos, como o registro de doações de roupas e de cestas básicas. 
+Ainda, é interessante que os profissionais que trabalham na instituição consigam cadastrar a ocorrência de atendimentos psicológicos e/ou jurídicos.
+        O acesso de administrador deve ser concedido aos membros da diretoria da ONG, que devem ser capazes de criar as contas dos demais voluntários que usarão o sistema.
+
+
+3. Recursos do sistema
+
+
+a. Cadastro de famílias beneficiárias: Envolve o cadastro de uma família atendida para que ela possa utilizar os serviços fornecidos pela ONG. Esse cadastro inclui uma série de dados pessoais sobre uma pessoa, considerada a representante da família, e permite que os demais membros de sua família sejam cadastrados como dependentes dela ao invés de requerer um cadastro por pessoa. Apenas a assistente social terá permissão para cadastrar novas famílias, além de editar e excluir seus dados.
+
+
+b. Consulta de famílias beneficiárias: Permite conferir os dados das famílias cadastradas. Além das informações pessoais da família selecionada, serão listadas as instâncias em que a família utilizou serviços da ONG, como o recebimento de cestas básicas. Todas as famílias devem ser listadas, sendo que apenas a assistente social deve ser capaz de modificar seus dados.
+
+
+c. Registro de atendimentos: Cadastro de um atendimento prestado a uma família por um profissional da organização, podendo ser de natureza jurídica ou psicológica. O recurso deve ser exclusivo aos profissionais responsáveis pelos atendimentos, que deverão ser capazes de consultar, registrar, editar e excluir as informações referentes à sessão. No momento do registro, uma das famílias cadastradas no banco de dados do sistema deverá ser selecionada, sendo o tipo de atendimento definido de acordo com o profissional responsável (advogada ou psicólogo).
+d. Registro de doação de cesta básica: Registro da doação de uma cesta básica a uma família cadastrada. A data da doação deve ser registrada, assim como os itens que constam na cesta doada. Tanto a assistente social como os demais voluntários devem ser capazes de consultar, registrar e excluir ocorrências de doações de cestas.
+
+
+e. Registro de doação de roupas: Registro da doação de roupas a uma família cadastrada. A data da doação e a quantidade de peças doadas devem ser registradas. Opcionalmente, pode ser informado quais peças foram levadas pela família. Tanto a assistente social como os demais voluntários devem ser capazes de consultar, registrar e excluir ocorrências de doações de roupas.
+
+
+f. Registro de visita: Registro de pedidos realizados por pessoas que passaram brevemente pela sede e não são regularmente atendidas pela instituição. Nesse caso, apenas dados essenciais do visitante devem ser coletados manualmente, sem a exigência do registro da família no banco de dados. A data e horário da visita, o voluntário que realizou o atendimento e o serviço solicitado pelo visitante são as principais informações a serem coletadas. Qualquer voluntário deve ser capaz de registrar as visitas no sistema. Voluntários devem ser capazes de consultar e excluir registros feitos por eles mesmos.
+
+
+g. Visualização da documentação da ONG: Na janela que reúne informações principais sobre a organização, deve ser possível acessar rapidamente os documentos mais relevantes para a elaboração de projetos, como o estatuto social, o cartão CNPJ e o alvará de funcionamento. Essa aba deve ser de acesso exclusivo da assistente social, que poderá submeter novos documentos, baixa-los ou excluir antigos para atualizá-los.
+
+
+h. Cadastro de voluntários externos: Consulta, adição, edição e exclusão de dados de voluntários que compõem a equipe de trabalho da Alimentar. Os voluntários externos, que não utilizam  o sistema e, portanto, não possuem cadastro, também devem ser registrados para a gestão das atividades da ONG. Além de dados pessoais básicos, a informação principal a ser registrada tange a frequência dos voluntários para identificar pessoas inativas na instituição. A assistente social será responsável por manter a lista de voluntários ativos atualizada.
+
+
+i. Gerência de usuários: Envolve o cadastro de usuários, a alteração de senha e o login no sistema. Apenas o administrador terá permissão para criar contas. Todos podem fazer login e solicitar a alteração de sua senha, caso necessário.
