@@ -1,0 +1,29 @@
+# Blueprint do Render (https://render.com/docs/blueprint-spec)
+# Define o serviço do backend. O deploy é disparado pelo GitHub Actions
+# (deploy hook), por isso autoDeploy fica desligado.
+services:
+  - type: web
+    name: sistema-girassol-api
+    runtime: docker
+    repo: https://github.com/ONG-Alimentar/Sistema-Girassol
+    branch: main
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    region: oregon
+    autoDeploy: false
+    healthCheckPath: /actuator/health
+    envVars:
+      # Conexão com o Postgres do Neon — preencher no painel do Render
+      # (Environment). Use a connection string do Neon (com sslmode=require).
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # Limita o heap da JVM ao plano free (512MB).
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=75
