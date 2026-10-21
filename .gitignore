@@ -1,0 +1,23 @@
+# Segredos / ambiente
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+dist/
+build/
+npm-debug.log*
+
+# Java / Maven
+target/
+*.class
+
+# Neon CLI (contexto local)
+.neon/
+
+# IDE / SO
+.idea/
+.vscode/
+*.iml
+.DS_Store
