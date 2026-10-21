@@ -43,9 +43,25 @@ só a parte alterada é buildada/deployada.
 
 ## Configuração (uma vez)
 
-### 1. Neon (banco)
-1. Criar projeto em <https://neon.tech> → copiar a **connection string**.
-2. Guardar para usar nas env vars do Render (passo 3).
+### 1. Neon (banco) — ✅ já provisionado
+Banco já criado e testado (conexão + escrita/leitura OK) em 2026-10-21.
+
+| Item | Valor |
+|---|---|
+| Projeto | `blue-scene-91714944` (org `org-tiny-lake-50634246`) |
+| Branch | `production` |
+| Região | `sa-east-1` (São Paulo) |
+| Banco / Role | `neondb` / `neondb_owner` |
+| Endpoint (pooled) | `ep-quiet-queen-b6o5tf4n-pooler.c-2.sa-east-1.aws.neon.tech` |
+| Postgres | 18.6 |
+
+A **connection string** (com a senha) está apenas no `.env.local` local
+(gitignored, fora do repositório) — a senha foi **rotacionada** após a
+criação, invalidando a que apareceu no terminal. Use o endpoint **pooled**
+(com `-pooler`) no backend, por causa do pool do HikariCP.
+
+> Para obter/rotacionar a string novamente: `neon connection-string production
+> --project-id blue-scene-91714944 --pooled` (requer `neon login`).
 
 ### 2. Cloudflare Pages (frontend)
 1. Em <https://dash.cloudflare.com> → Workers & Pages → **Create** → Pages →
@@ -55,9 +71,11 @@ só a parte alterada é buildada/deployada.
 
 ### 3. Render (backend)
 1. New → **Blueprint**, apontando para este repo (ele lê o `render.yaml`).
-2. Em Environment do serviço, preencher:
-   - `SPRING_DATASOURCE_URL` → `jdbc:postgresql://<host-neon>/<db>?sslmode=require`
-   - `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` (do Neon)
+2. Em Environment do serviço, preencher as 3 vars `SPRING_DATASOURCE_*`
+   (valores prontos no `.env.local`; o Neon já está provisionado — ver passo 1):
+   - `SPRING_DATASOURCE_URL` → `jdbc:postgresql://ep-quiet-queen-b6o5tf4n-pooler.c-2.sa-east-1.aws.neon.tech/neondb?sslmode=require`
+   - `SPRING_DATASOURCE_USERNAME` → `neondb_owner`
+   - `SPRING_DATASOURCE_PASSWORD` → (senha no `.env.local`)
 3. Settings → **Deploy Hook** → copiar a URL.
 
 ### 4. Segredos e variáveis no GitHub
