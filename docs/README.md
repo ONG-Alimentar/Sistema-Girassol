@@ -6,4 +6,5 @@ Cada entrega/milestone tem sua própria subpasta aqui dentro.
 ## Índice
 
 - [Casos de Uso](casos-de-uso/README.md) — milestone 16/09
+- [Diagrama de Classes](diagrama-de-classes/README.md) — modelo de domínio
 - [Segurança](seguranca/README.md) — controle de acesso (RBAC)
