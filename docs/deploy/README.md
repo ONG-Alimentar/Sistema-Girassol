@@ -8,9 +8,11 @@ gratuitas.
 | Camada | Ferramenta | Como faz deploy |
 |---|---|---|
 | CI/CD | **GitHub Actions** | `.github/workflows/deploy.yml` — roda testes e dispara os deploys |
-| Frontend (React + Vite) | **Cloudflare Pages** | Actions builda e publica `frontend/dist` |
+| Frontend (React + Vite) | **GitHub Pages** | Actions builda e publica `frontend/dist` (Pages source = Actions) |
 | Backend (Java Spring Boot) | **Render** (Docker, plano free) | Actions chama o *deploy hook* após os testes |
 | Banco | **Neon** (PostgreSQL serverless, free) | connection string nas env vars do Render |
+
+URL do frontend: <https://ong-alimentar.github.io/Sistema-Girassol/>
 
 ## Fluxo
 
@@ -19,7 +21,7 @@ push na main
    │
    ├── mudou backend/  → testes (mvnw verify) → POST no deploy hook do Render
    │                                              Render builda o Dockerfile e publica
-   └── mudou frontend/ → build (npm run build)  → wrangler pages deploy no Cloudflare
+   └── mudou frontend/ → build (npm run build)  → deploy no GitHub Pages (actions/deploy-pages)
 ```
 
 Pull requests rodam só os testes (sem deploy). Um filtro de path garante que
@@ -40,6 +42,10 @@ só a parte alterada é buildada/deployada.
 > frontend com **Vite** (`npm run build` → `frontend/dist`). Se usarem Gradle,
 > trocar os comandos no workflow e no `Dockerfile`; se o front for CRA, o output
 > é `build/` em vez de `dist/`.
+>
+> O Vite usa `base: '/Sistema-Girassol/'` no build (subpath do GitHub Pages).
+> Se o repositório for renomeado ou usar domínio próprio, ajustar o `base` em
+> `frontend/vite.config.js`.
 
 ## Configuração (uma vez)
 
@@ -63,11 +69,13 @@ criação, invalidando a que apareceu no terminal. Use o endpoint **pooled**
 > Para obter/rotacionar a string novamente: `neon connection-string production
 > --project-id blue-scene-91714944 --pooled` (requer `neon login`).
 
-### 2. Cloudflare Pages (frontend)
-1. Em <https://dash.cloudflare.com> → Workers & Pages → **Create** → Pages →
-   **Direct Upload**, nome do projeto: `sistema-girassol`.
-2. Criar um **API Token** (My Profile → API Tokens) com permissão
-   *Account → Cloudflare Pages → Edit*. Anotar o token e o **Account ID**.
+### 2. GitHub Pages (frontend) — ✅ já habilitado
+Pages ativado com **source = GitHub Actions** (não precisa de conta externa
+nem secrets). Publica em <https://ong-alimentar.github.io/Sistema-Girassol/>.
+
+O deploy é feito pelo próprio workflow (`actions/upload-pages-artifact` +
+`actions/deploy-pages`). Nada a configurar — só garantir que, em
+*Settings → Pages*, a **Source** esteja como **GitHub Actions**.
 
 ### 3. Render (backend)
 1. New → **Blueprint**, apontando para este repo (ele lê o `render.yaml`).
@@ -85,8 +93,8 @@ Repositório → Settings → Secrets and variables → Actions.
 | Nome | Valor |
 |---|---|
 | `RENDER_DEPLOY_HOOK_URL` | URL do deploy hook do Render |
-| `CLOUDFLARE_API_TOKEN` | token criado no passo 2 |
-| `CLOUDFLARE_ACCOUNT_ID` | Account ID da Cloudflare |
+
+(O frontend no GitHub Pages usa o `GITHUB_TOKEN` automático — sem secrets.)
 
 **Variables:**
 | Nome | Valor |

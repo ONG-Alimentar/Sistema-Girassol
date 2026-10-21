@@ -88,25 +88,24 @@ jobs:
         env:
           # URL pública do backend no Render (definida em Settings > Variables).
           VITE_API_URL: ${{ vars.VITE_API_URL }}
-      - name: Guardar artefato do build
-        uses: actions/upload-artifact@v4
+      - name: Fallback de SPA (404 -> index)
+        run: cp dist/index.html dist/404.html
+      - name: Preparar artefato do GitHub Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: frontend-dist
           path: frontend/dist
-          retention-days: 1
 
   deploy-frontend:
     needs: [changes, frontend-ci]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: dist
-      - name: Deploy no Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=sistema-girassol --branch=main
+      - name: Deploy no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
