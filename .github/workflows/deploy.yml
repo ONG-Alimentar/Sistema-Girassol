@@ -1,0 +1,111 @@
+name: CI/CD
+
+# Push na main -> roda os testes e, se passarem, dispara o deploy.
+# Pull request -> roda só os testes (não faz deploy).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancela execuções antigas do mesmo ref quando um novo push chega.
+concurrency:
+  group: cicd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Detecta o que mudou para rodar/deployar só a parte afetada.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/pom.xml'
+              - 'backend/src/**'
+              - 'backend/mvnw'
+            frontend:
+              - 'frontend/package.json'
+              - 'frontend/package-lock.json'
+              - 'frontend/src/**'
+              - 'frontend/vite.config.*'
+
+  # ---------------------------------------------------------------------------
+  # BACKEND — Java Spring Boot (Maven)
+  # ---------------------------------------------------------------------------
+  backend-ci:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Build e testes
+        run: ./mvnw -B verify
+
+  deploy-backend:
+    needs: [changes, backend-ci]
+    # Só na main, após os testes passarem.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar deploy no Render
+        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+  # ---------------------------------------------------------------------------
+  # FRONTEND — React (Vite)
+  # ---------------------------------------------------------------------------
+  frontend-ci:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          # URL pública do backend no Render (definida em Settings > Variables).
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+      - name: Fallback de SPA (404 -> index)
+        run: cp dist/index.html dist/404.html
+      - name: Preparar artefato do GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  deploy-frontend:
+    needs: [changes, frontend-ci]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
