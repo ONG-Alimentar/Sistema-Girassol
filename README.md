@@ -26,7 +26,8 @@ Usuária principal: assistente social da ONG. Voluntários podem ter acesso a fu
 
 ## Equipe
 
-TODO: listar integrantes do grupo
+| [<img src="https://github.com/Carpedim.png" width="90"><br><sub><b>Victor Reiznautt</b></sub>](https://github.com/Carpedim) | [<img src="https://github.com/charllynson.png" width="90"><br><sub><b>Charllynson C. Caxias</b></sub>](https://github.com/charllynson) | [<img src="https://github.com/duhdah.png" width="90"><br><sub><b>Eduarda Medeiros</b></sub>](https://github.com/duhdah) | [<img src="https://github.com/gckneip.png" width="90"><br><sub><b>Gustavo Cunha</b></sub>](https://github.com/gckneip) | [<img src="https://github.com/jvlago.png" width="90"><br><sub><b>João Vitor M. Lago</b></sub>](https://github.com/jvlago) |
+|:---:|:---:|:---:|:---:|:---:|
 
 ## Como rodar
 
