@@ -44,14 +44,18 @@ O projeto tem duas partes independentes: `backend/` (API Spring Boot) e
 
 > No clone você só precisa do que for mexer: dá pra rodar só o front, só o back, ou os dois.
 
+> **Windows:** os comandos abaixo estão no formato Unix (bash). No **PowerShell/CMD**,
+> troque `./mvnw` por `.\mvnw.cmd` (o wrapper já vem com as duas versões). Alternativa
+> sem ajustes: rodar tudo pelo **Git Bash** ou **WSL**, onde os comandos funcionam como estão.
+> O Docker no Windows exige o **Docker Desktop** (backend WSL2).
+
 ### Backend (API — `backend/`)
 
 O backend usa JPA + Postgres, então precisa de um banco rodando. Suba um
 Postgres local com Docker:
 
 ```bash
-docker run --name girassol-db -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=girassol -p 5432:5432 -d postgres:18
+docker run --name girassol-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=girassol -p 5432:5432 -d postgres:18
 ```
 
 E rode a API com o profile `dev` (aponta para esse Postgres local por padrão):
@@ -77,12 +81,13 @@ Outros comandos úteis:
 ./mvnw verify     # build completo + testes (igual ao CI)
 ```
 
-> **Banco de dados:** o schema é versionado com **Flyway** (migrations em
-> `src/main/resources/db/migration/`), e o Hibernate roda em `validate` — ou
-> seja, nunca altera o banco, só confere que as entidades batem com o schema das
-> migrations. O profile `dev` usa um Postgres local; em produção as credenciais
-> do Neon vão nas vars `SPRING_DATASOURCE_*` (modelo em `.env.local`, fora do
-> repositório). Detalhes em [`docs/deploy/`](docs/deploy/).
+> **Banco de dados:** o schema é gerado pelo **Hibernate** a partir das
+> entidades JPA (`spring.jpa.hibernate.ddl-auto=update`) — adequado ao protótipo
+> da disciplina, sem migrations à mão. Atenção: `update` só acrescenta (não
+> remove nem renomeia colunas); para mudança destrutiva em dev, recrie o
+> container do Postgres. O profile `dev` usa um Postgres local; em produção as
+> credenciais do Neon vão nas vars `SPRING_DATASOURCE_*` (modelo em `.env.local`,
+> fora do repositório). Detalhes em [`docs/deploy/`](docs/deploy/).
 
 ### Frontend (React — `frontend/`)
 
