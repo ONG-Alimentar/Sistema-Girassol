@@ -8,8 +8,8 @@ import org.testcontainers.utility.DockerImageName;
 
 /**
  * Sobe um Postgres real (Docker) para os testes. {@code @ServiceConnection} liga
- * o datasource da aplicação a este container automaticamente — as migrations do
- * Flyway rodam contra ele no startup do contexto.
+ * o datasource da aplicação a este container automaticamente — o Hibernate gera
+ * o schema (ddl-auto=update) contra ele no startup do contexto.
  *
  * Importe nos testes que precisam de banco: {@code @Import(TestcontainersConfiguration.class)}.
  */

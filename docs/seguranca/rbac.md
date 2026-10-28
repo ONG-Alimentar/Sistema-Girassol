@@ -131,7 +131,8 @@ papel_permissao (papel_id, permissao_id)       -- N:N
 ```
 
 O mapeamento papel→permissão deve ficar **no banco** (não em `enum`), populado por
-seed/migration (ex.: Flyway). Assim a diretoria pode reajustar acessos sem redeploy.
+um seed na inicialização (ex.: `data.sql` ou um `CommandLineRunner`). Assim a
+diretoria pode reajustar acessos sem redeploy.
 
 ## Considerações e armadilhas do modelo atual
 
@@ -158,5 +159,5 @@ do código). **Evitar ABAC / row-level agora** — não há requisito que o exij
 - [ ] Validar o catálogo de permissões com o grupo
 - [ ] Resolver a pendência #1 (jurídico/psicológico: registrar/editar apenas?) antes do seed
 - [ ] Definir mecanismo de autenticação (sessão × JWT)
-- [ ] Escrever a migration de seed dos papéis e permissões (Flyway)
+- [ ] Escrever o seed dos papéis e permissões (`data.sql` ou `CommandLineRunner`)
 - [ ] Escrever testes de autorização por papel (foco em jurídico/psicológico)
