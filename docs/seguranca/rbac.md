@@ -10,7 +10,7 @@ e [`../casos-de-uso/casos-de-uso.md`](../casos-de-uso/casos-de-uso.md)
 **Recomendado — o encaixe é excelente.** O sistema já reúne os pré-requisitos que
 tornam RBAC natural:
 
-- **Papéis bem definidos e estáveis** (`atores.md`): Administrador, Assistente social,
+- **Cargos bem definidos e estáveis** (`atores.md`): Administrador, Assistente social,
   Voluntário interno, Advogada, Psicólogo — mais o ator abstrato Usuário.
 - **Casos de uso em padrão CRUD por módulo** (`casos-de-uso.md`): cada pacote (famílias,
   jurídico, psicológico, cestas, roupas, etc.) tem Consultar/Cadastrar/Editar/Deletar.
@@ -23,14 +23,14 @@ atendimentos **jurídicos** e **psicológicos** são confidenciais e, pelo model
 são acessíveis à assistente social. São dados sensíveis de famílias vulneráveis →
 implicação de **LGPD**. Um RBAC bem-feito é o que garante esse isolamento.
 
-## Papéis puros × permissões granulares
+## Cargos puros × permissões granulares
 
 Recomenda-se o modelo **permission-based**, e não role-based puro:
 
 | Abordagem | Como funciona | Problema |
 |---|---|---|
-| Role-based puro | `hasRole('ASSISTENTE_SOCIAL')` espalhado no código | Política fica *hardcoded*; a sobreposição entre papéis (cestas/roupas/visitas são de **assistente social E voluntário interno**) vira `if` duplicado |
-| **Permission-based (recomendado)** | Papel é um **agrupamento** de permissões; o código verifica a **permissão** (`hasAuthority('FAMILIA:CREATE')`) | Define a permissão uma vez e reusa em vários papéis; muda a política sem tocar no código |
+| Role-based puro | `hasRole('ASSISTENTE_SOCIAL')` espalhado no código | Política fica *hardcoded*; a sobreposição entre cargos (cestas/roupas/visitas são de **assistente social E voluntário interno**) vira `if` duplicado |
+| **Permission-based (recomendado)** | Cargo é um **agrupamento** de permissões; o código verifica a **permissão** (`hasAuthority('FAMILIA:CREATE')`) | Define a permissão uma vez e reusa em vários cargos; muda a política sem tocar no código |
 
 A sobreposição do modelo atual (cestas/roupas/visitas compartilhadas entre assistente
 social e voluntário interno) é exatamente o caso em que o modelo granular ganha.
@@ -55,9 +55,9 @@ JURIDICO:READ|CREATE|UPDATE|DELETE
 PSICOLOGICO:READ|CREATE|UPDATE|DELETE
 ```
 
-Mapeamento papel → permissões:
+Mapeamento cargo → permissões:
 
-| Papel | Permissões |
+| Cargo | Permissões |
 |---|---|
 | **Administrador** | **Todas as permissões** deste catálogo (superusuário) — ver exceção de sigilo abaixo |
 | **Assistente social** | FAMILIA / DOCUMENTACAO / PROJETO / FINANCEIRO / VOL_EXTERNO (CRUD) + CESTA / ROUPA / VISITA (CRD) + `SENHA:UPDATE_SELF` |
@@ -67,25 +67,25 @@ Mapeamento papel → permissões:
 
 > **Nota:** se a pendência #1 de `casos-de-uso.md` for resolvida (a descrição prevê apenas
 > registrar/editar em jurídico/psicológico), basta **não conceder** `:READ`/`:DELETE` a
-> esses papéis. Nenhuma mudança de código — apenas do seed.
+> esses cargos. Nenhuma mudança de código — apenas do seed.
 
 ### Exceção de sigilo — Administrador superusuário
 
-Por decisão do grupo, o papel **Administrador** recebe **todas** as permissões do
+Por decisão do grupo, o cargo **Administrador** recebe **todas** as permissões do
 catálogo, **incluindo** `JURIDICO:*` e `PSICOLOGICO:*` — ou seja, acesso aos dados
 sigilosos de atendimentos jurídicos e psicológicos.
 
-Isto é uma **exceção consciente ao princípio de menor privilégio**: os demais papéis
+Isto é uma **exceção consciente ao princípio de menor privilégio**: os demais cargos
 (inclusive a assistente social) permanecem sem acesso a esses dados. Implicações a
 mitigar por serem dados sensíveis (LGPD):
 
-- Restringir o papel Administrador a poucas pessoas de confiança (diretoria).
+- Restringir o cargo Administrador a poucas pessoas de confiança (diretoria).
 - **Auditar** acessos do Administrador a `JURIDICO:*`/`PSICOLOGICO:*` (log de quem,
   quando e qual registro).
 - Deixar essa exceção documentada e aprovada, não como acesso implícito/acidental.
 
-No modelo de dados, isto se resolve **sem privilégio hardcoded**: o papel Administrador
-simplesmente é semeado com o vínculo para todas as `permissao` em `papel_permissao`.
+No modelo de dados, isto se resolve **sem privilégio hardcoded**: o cargo Administrador
+simplesmente é semeado com o vínculo para todas as `permissao` em `cargo_permissao`.
 
 ## Proteção por camadas (defesa em profundidade)
 
@@ -117,30 +117,30 @@ não RBAC — exige filtro por escopo/ownership no repositório. O modelo atual 
 exige isso.
 
 Elo com o Spring: cada `Permission` vira um `GrantedAuthority`. No `UserDetailsService`,
-carregue usuário → papéis → permissões e devolva as *strings* de permissão como
+carregue usuário → cargos → permissões e devolva as *strings* de permissão como
 autoridades.
 
 ## Modelo de dados sugerido
 
 ```
 usuario         (id, email, senha_hash, ativo)
-papel           (id, nome)                     -- ADMINISTRADOR, ASSISTENTE_SOCIAL, ...
+cargo           (id, nome)                     -- ADMINISTRADOR, ASSISTENTE_SOCIAL, ...
 permissao       (id, codigo)                   -- FAMILIA:CREATE, ...
-usuario_papel   (usuario_id, papel_id)         -- N:N
-papel_permissao (papel_id, permissao_id)       -- N:N
+usuario_cargo   (usuario_id, cargo_id)         -- N:N
+cargo_permissao (cargo_id, permissao_id)       -- N:N
 ```
 
-O mapeamento papel→permissão deve ficar **no banco** (não em `enum`), populado por
+O mapeamento cargo→permissão deve ficar **no banco** (não em `enum`), populado por
 um seed na inicialização (ex.: `data.sql` ou um `CommandLineRunner`). Assim a
 diretoria pode reajustar acessos sem redeploy.
 
 ## Considerações e armadilhas do modelo atual
 
-- **Usuário abstrato:** não é papel concedível — é apenas o portador de
-  `SENHA:UPDATE_SELF` e `Login`. No banco, conceda essa permissão a todos os papéis
+- **Usuário abstrato:** não é cargo concedível — é apenas o portador de
+  `SENHA:UPDATE_SELF` e `Login`. No banco, conceda essa permissão a todos os cargos
   (ou trate como "autenticado").
 - **Voluntário externo NÃO é ator** (`atores.md`): é um *dado* gerido pela assistente
-  social; nunca recebe conta nem permissão. Não criar papel para ele.
+  social; nunca recebe conta nem permissão. Não criar cargo para ele.
 - **Casos incluídos/estendidos** ("Selecionar família beneficiada", "Informar itens
   doados") não são permissões próprias — fazem parte da operação que os inclui. Não
   criar permissão para eles.
@@ -159,5 +159,5 @@ do código). **Evitar ABAC / row-level agora** — não há requisito que o exij
 - [ ] Validar o catálogo de permissões com o grupo
 - [ ] Resolver a pendência #1 (jurídico/psicológico: registrar/editar apenas?) antes do seed
 - [ ] Definir mecanismo de autenticação (sessão × JWT)
-- [ ] Escrever o seed dos papéis e permissões (`data.sql` ou `CommandLineRunner`)
-- [ ] Escrever testes de autorização por papel (foco em jurídico/psicológico)
+- [ ] Escrever o seed dos cargos e permissões (`data.sql` ou `CommandLineRunner`)
+- [ ] Escrever testes de autorização por cargo (foco em jurídico/psicológico)
