@@ -1,0 +1,49 @@
+# Adiciona toda PR ao Project #3 (kanban) e move para a coluna "In review"
+# quando a PR é aberta, reaberta, marcada como pronta ou tem review solicitado.
+#
+# Requer um secret PROJECTS_TOKEN: um Personal Access Token com permissão de
+# escrita em Projects da org (o GITHUB_TOKEN padrão não escreve em Projects de
+# organização). Ver README de deploy / instruções abaixo.
+name: Project — mover PR para In review
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, review_requested]
+
+# Evita corridas quando vários eventos da mesma PR chegam juntos.
+concurrency:
+  group: project-in-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  in-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Adicionar a PR ao Project
+        id: add
+        uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/ONG-Alimentar/projects/3
+          github-token: ${{ secrets.PROJECTS_TOKEN }}
+
+      - name: Setar Status = In review
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ITEM_ID: ${{ steps.add.outputs.itemId }}
+          PROJECT_ID: PVT_kwDOE1d4GM4BiWWA
+          STATUS_FIELD_ID: PVTSSF_lADOE1d4GM4BiWWAzhhOua4
+          IN_REVIEW_OPTION_ID: df73e18b
+        run: |
+          gh api graphql -f query='
+            mutation($project:ID!, $item:ID!, $field:ID!, $value:String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $project,
+                itemId: $item,
+                fieldId: $field,
+                value: { singleSelectOptionId: $value }
+              }) { projectV2Item { id } }
+            }' \
+            -f project="$PROJECT_ID" \
+            -f item="$ITEM_ID" \
+            -f field="$STATUS_FIELD_ID" \
+            -f value="$IN_REVIEW_OPTION_ID"
