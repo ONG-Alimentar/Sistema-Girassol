@@ -63,7 +63,8 @@
 		</dependency>
 
 		<!-- Testcontainers: sobe um Postgres real (Docker) nos testes.
-		     As migrations do Flyway rodam contra ele, validando entidade + schema. -->
+		     O schema gerado pelo Hibernate (ddl-auto) roda contra ele, validando
+		     o mapeamento das entidades. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-testcontainers</artifactId>
