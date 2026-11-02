@@ -45,7 +45,7 @@ só a parte alterada é buildada/deployada.
 >
 > O Vite usa `base: '/Sistema-Girassol/'` no build (subpath do GitHub Pages).
 > Se o repositório for renomeado ou usar domínio próprio, ajustar o `base` em
-> `frontend/vite.config.js`.
+> `frontend/vite.config.ts`.
 
 ## Configuração (uma vez)
 
