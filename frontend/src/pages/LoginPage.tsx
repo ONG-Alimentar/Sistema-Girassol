@@ -1,20 +1,21 @@
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/useAuth.js'
+import { useAuth } from '../auth/useAuth.ts'
 
 /** Tela de login. Após autenticar, volta para a rota de origem (ou a home). */
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = location.state?.from?.pathname ?? '/'
+  const from = (location.state as { from?: { pathname?: string } })?.from?.pathname ?? '/'
 
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [erro, setErro] = useState(null)
+  const [erro, setErro] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setErro(null)
     setEnviando(true)
@@ -22,7 +23,7 @@ export function LoginPage() {
       await login({ email, senha })
       navigate(from, { replace: true })
     } catch (e) {
-      setErro(e.message ?? 'Não foi possível entrar.')
+      setErro(e instanceof Error ? e.message : 'Não foi possível entrar.')
     } finally {
       setEnviando(false)
     }

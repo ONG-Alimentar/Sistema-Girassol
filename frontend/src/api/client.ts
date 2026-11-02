@@ -7,15 +7,23 @@ const API_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
 
 /** Erro de API com o status HTTP e o corpo já parseado (quando houver). */
 export class ApiError extends Error {
-  constructor(message, { status, body } = {}) {
+  readonly status?: number
+  readonly body?: unknown
+
+  constructor(message: string, options: { status?: number; body?: unknown } = {}) {
     super(message)
     this.name = 'ApiError'
-    this.status = status
-    this.body = body
+    this.status = options.status
+    this.body = options.body
   }
 }
 
-async function parseBody(response) {
+/** Opções de `apiFetch`: iguais a `fetch`, mas `body` pode ser um objeto. */
+export interface ApiFetchOptions extends Omit<RequestInit, 'body'> {
+  body?: BodyInit | object | null
+}
+
+async function parseBody(response: Response): Promise<unknown> {
   const contentType = response.headers.get('content-type') ?? ''
   if (contentType.includes('application/json')) {
     return response.json()
@@ -25,15 +33,15 @@ async function parseBody(response) {
 }
 
 /**
- * Faz uma requisição ao backend.
+ * Faz uma requisição ao backend. `body` é serializado como JSON quando não for
+ * string/FormData. Lança {@link ApiError} em respostas não-2xx.
  *
- * @param {string} path  Caminho relativo à API (ex.: '/api/auth/me').
- * @param {RequestInit & { body?: unknown }} [options]  `body` é serializado
- *   como JSON automaticamente quando não for string/FormData.
- * @returns {Promise<unknown>} Corpo da resposta (JSON ou texto); null em 204.
- * @throws {ApiError} Quando a resposta não é 2xx.
+ * @typeParam T  Tipo esperado do corpo da resposta.
  */
-export async function apiFetch(path, options = {}) {
+export async function apiFetch<T = unknown>(
+  path: string,
+  options: ApiFetchOptions = {},
+): Promise<T> {
   const { body, headers, ...rest } = options
 
   const isJsonBody =
@@ -52,19 +60,25 @@ export async function apiFetch(path, options = {}) {
       ...headers,
     },
     ...(body !== undefined
-      ? { body: isJsonBody ? JSON.stringify(body) : body }
+      ? { body: isJsonBody ? JSON.stringify(body) : (body as BodyInit) }
       : {}),
     ...rest,
   })
 
   if (!response.ok) {
     const errorBody = await parseBody(response).catch(() => null)
-    const message =
-      (errorBody && typeof errorBody === 'object' && errorBody.message) ||
-      `Requisição falhou (${response.status})`
+    let message = `Requisição falhou (${response.status})`
+    if (
+      errorBody &&
+      typeof errorBody === 'object' &&
+      'message' in errorBody &&
+      typeof errorBody.message === 'string'
+    ) {
+      message = errorBody.message
+    }
     throw new ApiError(message, { status: response.status, body: errorBody })
   }
 
-  if (response.status === 204) return null
-  return parseBody(response)
+  if (response.status === 204) return null as T
+  return parseBody(response) as Promise<T>
 }

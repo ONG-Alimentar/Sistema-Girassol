@@ -1,16 +1,23 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { PermissionGuard } from './auth/PermissionGuard.jsx'
-import { RequireAuth } from './auth/RequireAuth.jsx'
-import { AppLayout } from './layouts/AppLayout.jsx'
-import { DashboardPage } from './pages/DashboardPage.jsx'
-import { ForbiddenPage } from './pages/ForbiddenPage.jsx'
-import { LoginPage } from './pages/LoginPage.jsx'
-import { ModulePlaceholder } from './pages/ModulePlaceholder.jsx'
-import { NotFoundPage } from './pages/NotFoundPage.jsx'
+import { PermissionGuard } from './auth/PermissionGuard.tsx'
+import { RequireAuth } from './auth/RequireAuth.tsx'
+import type { Permission } from './auth/permissions.ts'
+import { AppLayout } from './layouts/AppLayout.tsx'
+import { DashboardPage } from './pages/DashboardPage.tsx'
+import { ForbiddenPage } from './pages/ForbiddenPage.tsx'
+import { LoginPage } from './pages/LoginPage.tsx'
+import { ModulePlaceholder } from './pages/ModulePlaceholder.tsx'
+import { NotFoundPage } from './pages/NotFoundPage.tsx'
+
+interface ModuleRoute {
+  path: string
+  title: string
+  permission: Permission
+}
 
 // Módulos protegidos por permissão. Cada um vira uma rota cujo elemento é
 // envolvido por PermissionGuard (redirect → /403 quando falta a permissão).
-const MODULES = [
+const MODULES: ModuleRoute[] = [
   { path: 'familias', title: 'Famílias', permission: 'FAMILIA:READ' },
   { path: 'cestas', title: 'Cestas', permission: 'CESTA:READ' },
   { path: 'roupas', title: 'Roupas', permission: 'ROUPA:READ' },
@@ -19,7 +26,8 @@ const MODULES = [
   { path: 'psicologico', title: 'Psicológico', permission: 'PSICOLOGICO:READ' },
 ]
 
-function App() {
+/** Árvore de rotas da aplicação. */
+export function AppRoutes() {
   return (
     <Routes>
       {/* Pública */}
@@ -50,5 +58,3 @@ function App() {
     </Routes>
   )
 }
-
-export default App

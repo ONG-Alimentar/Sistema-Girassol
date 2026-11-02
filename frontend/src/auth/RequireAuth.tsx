@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { useAuth } from './useAuth.js'
+import { useAuth } from './useAuth.ts'
 
 /**
  * Protege rotas que exigem apenas autenticação. Enquanto a sessão é restaurada,

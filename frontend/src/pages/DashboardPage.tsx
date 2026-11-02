@@ -1,4 +1,4 @@
-import { useAuth } from '../auth/useAuth.js'
+import { useAuth } from '../auth/useAuth.ts'
 
 /** Home do app autenticado. */
 export function DashboardPage() {

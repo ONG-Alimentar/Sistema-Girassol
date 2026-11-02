@@ -1,5 +1,17 @@
 import { Navigate } from 'react-router-dom'
-import { useAuth } from './useAuth.js'
+import type { ReactNode } from 'react'
+import { useAuth } from './useAuth.ts'
+import type { Permission } from './permissions.ts'
+
+interface PermissionGuardProps {
+  /** Permissão(ões) exigida(s); basta uma (OR). */
+  permission: Permission | Permission[]
+  /** Se true, redireciona para /403 quando faltar (uso como guard de rota). */
+  redirect?: boolean
+  /** Render quando faltar a permissão e `redirect` for false. */
+  fallback?: ReactNode
+  children?: ReactNode
+}
 
 /**
  * Libera o conteúdo apenas se o usuário tiver a(s) permissão(ões) exigida(s).
@@ -10,22 +22,16 @@ import { useAuth } from './useAuth.js'
  *        <PermissionGuard permission="FAMILIA:READ" redirect><FamiliasPage/></PermissionGuard>} />
  *  - UI condicional: sem `redirect`, apenas oculta (ou mostra `fallback`).
  *      <PermissionGuard permission="FAMILIA:CREATE"><BotaoNova/></PermissionGuard>
- *
- * @param {Object} props
- * @param {string|string[]} props.permission  Permissão(ões); basta uma (OR).
- * @param {boolean} [props.redirect=false]  Redireciona para /403 se faltar.
- * @param {React.ReactNode} [props.fallback=null]  Render quando faltar e sem redirect.
- * @param {React.ReactNode} [props.children]
  */
 export function PermissionGuard({
   permission,
   redirect = false,
   fallback = null,
   children,
-}) {
+}: PermissionGuardProps) {
   const { can } = useAuth()
 
-  if (can(permission)) return children ?? null
+  if (can(permission)) return <>{children}</>
   if (redirect) return <Navigate to="/403" replace />
-  return fallback
+  return <>{fallback}</>
 }

@@ -1,9 +1,16 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/useAuth.js'
+import { useAuth } from '../auth/useAuth.ts'
+import type { Permission } from '../auth/permissions.ts'
+
+interface NavItem {
+  to: string
+  label: string
+  permission: Permission
+}
 
 // Itens de navegação e a permissão que cada um exige. O menu só mostra o que o
 // usuário pode acessar — a proteção real fica nas rotas (PermissionGuard).
-const NAV_ITEMS = [
+const NAV_ITEMS: NavItem[] = [
   { to: '/familias', label: 'Famílias', permission: 'FAMILIA:READ' },
   { to: '/cestas', label: 'Cestas', permission: 'CESTA:READ' },
   { to: '/roupas', label: 'Roupas', permission: 'ROUPA:READ' },
