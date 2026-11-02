@@ -20,7 +20,7 @@ Usuária principal: assistente social da ONG. Voluntários podem ter acesso a fu
 ## Stack
 
 - **Backend:** Java 21 + Spring Boot (Spring Web MVC, Actuator) — build com Maven Wrapper
-- **Frontend:** React 19 + Vite
+- **Frontend:** React 19 + Vite + TypeScript
 - **Banco de dados:** PostgreSQL (Neon, serverless)
 - **Deploy:** GitHub Actions → GitHub Pages (frontend) + Render (backend). Ver [`docs/deploy/`](docs/deploy/).
 
@@ -102,10 +102,15 @@ O Vite imprime a URL no terminal (padrão <http://localhost:5173>).
 Outros comandos:
 
 ```bash
-npm run build      # build de produção -> frontend/dist
+npm run build      # checa tipos (tsc) + build de produção -> frontend/dist
 npm run preview    # serve o build localmente
 npm run lint       # oxlint
+npm run typecheck  # só a checagem de tipos (tsc), sem buildar
 ```
+
+> **TypeScript:** o frontend é em TS (arquivos `.ts`/`.tsx`). O `npm run dev`
+> transpila na hora (sem passo extra); o `npm run build` roda `tsc` antes do
+> Vite, então um erro de tipo quebra o build (e o deploy).
 
 > **URL da API:** o frontend lê a base da API de `import.meta.env.VITE_API_URL`.
 > Para desenvolvimento local apontando no backend local, crie um

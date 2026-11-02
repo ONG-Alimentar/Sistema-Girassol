@@ -35,6 +35,8 @@ jobs:
               - 'frontend/package-lock.json'
               - 'frontend/src/**'
               - 'frontend/vite.config.*'
+              - 'frontend/tsconfig*.json'
+              - 'frontend/index.html'
 
   # ---------------------------------------------------------------------------
   # BACKEND — Java Spring Boot (Maven)
