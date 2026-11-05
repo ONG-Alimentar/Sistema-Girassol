@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   in-review:
+    if: ${{ secrets.PROJECTS_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Adicionar a PR ao Project
