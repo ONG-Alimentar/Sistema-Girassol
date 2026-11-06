@@ -32,7 +32,7 @@ export function LoginPage() {
   return (
     <main style={{ maxWidth: 360, margin: '4rem auto', padding: '0 1rem' }}>
       <h1>Entrar</h1>
-      <p>Sistema Girassol - Teste Apresentação</p>
+      <p>Sistema Girassol - Teste apresentação de verdade</p>
       <form
         onSubmit={handleSubmit}
         style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
