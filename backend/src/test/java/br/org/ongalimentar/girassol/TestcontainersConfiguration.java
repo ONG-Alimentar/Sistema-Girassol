@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName;
  * Importe nos testes que precisam de banco: {@code @Import(TestcontainersConfiguration.class)}.
  */
 @TestConfiguration(proxyBeanMethods = false)
-class TestcontainersConfiguration {
+public class TestcontainersConfiguration {
 
 	@Bean
 	@ServiceConnection
