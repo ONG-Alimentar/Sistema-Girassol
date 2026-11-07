@@ -1,4 +1,3 @@
-import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
 export interface ConfirmDialogOptions {
@@ -16,17 +15,21 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, options, onConfirm, onCancel }) => (
-  <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
-    <DialogTitle>{options.title || 'Confirmação'}</DialogTitle>
-    <DialogContent>
-      <DialogContentText>{options.message}</DialogContentText>
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={onCancel} color="inherit">{options.cancelText || 'Cancelar'}</Button>
-      <Button onClick={onConfirm} color={options.color || 'error'} variant="contained" autoFocus>
-        {options.confirmText || 'Confirmar'}
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+export function ConfirmDialog({ open, options, onConfirm, onCancel }: ConfirmDialogProps) {
+  return (
+    <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
+      <DialogTitle>{options.title || 'Confirmação'}</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{options.message}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onCancel} color="inherit">
+          {options.cancelText || 'Cancelar'}
+        </Button>
+        <Button onClick={onConfirm} color={options.color || 'error'} variant="contained" autoFocus>
+          {options.confirmText || 'Confirmar'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}

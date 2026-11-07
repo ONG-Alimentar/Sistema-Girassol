@@ -1,27 +1,38 @@
-import { useState, useCallback } from 'react';
-import type { ConfirmDialogOptions } from '../components/common/ConfirmDialog';
+import { useState, useCallback, useRef } from 'react';
+import type { ConfirmDialogOptions } from '../components/common/ConfirmDialog.tsx';
 
-export const useConfirm = () => {
+export function useConfirm() {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<ConfirmDialogOptions>({ message: '' });
-  const [resolver, setResolver] = useState<((value: boolean) => void) | null>(null);
+  const resolverRef = useRef<((value: boolean) => void) | null>(null);
 
   const confirm = useCallback((dialogOptions: ConfirmDialogOptions): Promise<boolean> => {
+    // Se já houver uma confirmação pendente, resolve a anterior como falsa antes de abrir a nova
+    if (resolverRef.current) {
+      resolverRef.current(false);
+    }
+
     setOptions(dialogOptions);
     setOpen(true);
     return new Promise((resolve) => {
-      setResolver(() => resolve);
+      resolverRef.current = resolve;
     });
   }, []);
 
   const handleConfirm = () => {
     setOpen(false);
-    if (resolver) resolver(true);
+    if (resolverRef.current) {
+      resolverRef.current(true);
+      resolverRef.current = null;
+    }
   };
 
   const handleCancel = () => {
     setOpen(false);
-    if (resolver) resolver(false);
+    if (resolverRef.current) {
+      resolverRef.current(false);
+      resolverRef.current = null;
+    }
   };
 
   return {
@@ -33,4 +44,4 @@ export const useConfirm = () => {
       onCancel: handleCancel,
     },
   };
-};
+}

@@ -1,15 +1,14 @@
-import React, { createContext, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useState } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 import type { AlertColor, SnackbarCloseReason } from '@mui/material';
+import { ToastContext } from './toast-context.ts';
 
-interface ToastContextType {
-  showToast: (message: string, severity?: AlertColor) => void;
+interface ToastProviderProps {
+  children: ReactNode;
 }
 
-export const ToastContext = createContext<ToastContextType | undefined>(undefined);
-
-export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export function ToastProvider({ children }: ToastProviderProps) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState<AlertColor>('success');
@@ -21,7 +20,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const handleClose = (
-    _event?: React.SyntheticEvent | Event | null,
+    _event?: SyntheticEvent | Event | null,
     reason?: SnackbarCloseReason
   ) => {
     if (reason === 'clickaway') return;
@@ -43,4 +42,4 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       </Snackbar>
     </ToastContext.Provider>
   );
-};
+}
