@@ -105,8 +105,9 @@ jobs:
         env:
           # URL pública do backend no Render (definida em Settings > Variables).
           VITE_API_URL: ${{ vars.VITE_API_URL }}
-      - name: Fallback de SPA (404 -> index)
-        run: cp dist/index.html dist/404.html
+      # O fallback de SPA agora é o frontend/public/404.html (redirect trick
+      # spa-github-pages), copiado pelo Vite para dist/ — deep-links terminam
+      # em 200. Não sobrescrever com o index.html.
       - name: Preparar artefato do GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
