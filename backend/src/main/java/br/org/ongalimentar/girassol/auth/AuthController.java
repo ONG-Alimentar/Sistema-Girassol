@@ -49,6 +49,13 @@ public class AuthController {
 					UsernamePasswordAuthenticationToken.unauthenticated(
 							credenciais.email(), credenciais.senha()));
 
+			// Rotaciona a sessão no login (prevenção de session fixation).
+			HttpSession sessaoAnterior = request.getSession(false);
+			if (sessaoAnterior != null) {
+				sessaoAnterior.invalidate();
+			}
+			request.getSession(true);
+
 			// Persiste o contexto na sessão → o cookie autentica as próximas chamadas.
 			SecurityContext context = securityContextHolderStrategy.createEmptyContext();
 			context.setAuthentication(authentication);
