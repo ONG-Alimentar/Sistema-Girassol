@@ -37,7 +37,7 @@ describe('App — roteamento no subpath de produção', () => {
 
     render(<App />)
 
-    expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /entrar/i })).toBeInTheDocument()
     expect(screen.queryByText(/Página não encontrada/i)).not.toBeInTheDocument()
   })
 
@@ -48,7 +48,7 @@ describe('App — roteamento no subpath de produção', () => {
 
     // Sem sessão, RequireAuth manda para /login — prova de que a raiz casa uma
     // rota (o bug do basename fazia cair no fallback '* → /404').
-    expect(await screen.findByRole('heading', { name: 'Entrar' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /entrar/i })).toBeInTheDocument()
     expect(screen.queryByText(/Página não encontrada/i)).not.toBeInTheDocument()
   })
 })
