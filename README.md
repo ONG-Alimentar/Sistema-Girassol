@@ -40,7 +40,7 @@ O projeto tem duas partes independentes: `backend/` (API Spring Boot) e
 |---|---|---|
 | **JDK** | 21 | backend (o Maven vem junto, via `./mvnw` — não precisa instalar o Maven) |
 | **Docker** | — | backend: Postgres local e testes (Testcontainers sobe um Postgres em container) |
-| **Node.js** | 20+ | frontend |
+| **Node.js** | 26 (ver `frontend/.nvmrc`) | frontend — com `nvm`: `cd frontend && nvm install && nvm use` |
 
 > No clone você só precisa do que for mexer: dá pra rodar só o front, só o back, ou os dois.
 
