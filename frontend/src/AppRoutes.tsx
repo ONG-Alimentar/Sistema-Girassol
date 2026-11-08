@@ -5,10 +5,9 @@ import type { Permission } from './auth/permissions.ts'
 import { AppLayout } from './layouts/AppLayout.tsx'
 import { DashboardPage } from './pages/DashboardPage.tsx'
 import { ForbiddenPage } from './pages/ForbiddenPage.tsx'
-//import { LoginPage } from './pages/LoginPage.tsx'
+import { LoginPage } from './pages/LoginPage.tsx'
 import { ModulePlaceholder } from './pages/ModulePlaceholder.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
-import { FieldsTest } from './pages/FieldsTest.tsx'
 
 interface ModuleRoute {
   path: string
@@ -32,7 +31,7 @@ export function AppRoutes() {
   return (
     <Routes>
       {/* Pública */}
-      <Route path="/teste-campos" element={<FieldsTest />} />
+      <Route path="/login" element={<LoginPage />} />
 
       {/* Autenticadas: RequireAuth protege todo o grupo */}
       <Route element={<RequireAuth />}>
