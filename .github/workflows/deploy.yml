@@ -42,6 +42,7 @@ jobs:
               - 'frontend/package-lock.json'
               - 'frontend/src/**'
               - 'frontend/vite.config.*'
+              - 'frontend/vitest.config.*'
               - 'frontend/tsconfig*.json'
               - 'frontend/index.html'
 
@@ -94,6 +95,8 @@ jobs:
       - run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Testes
+        run: npm run test
       - name: Build
         run: npm run build
         env:
