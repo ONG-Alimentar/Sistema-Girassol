@@ -40,6 +40,12 @@
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 
+		<!-- Bean Validation (@Valid/@NotBlank nos DTOs de request). -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
 		<!-- Persistência: JPA/Hibernate + driver do Postgres (Neon) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
