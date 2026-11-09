@@ -48,3 +48,10 @@ Em produção, `VITE_API_URL` é definida no GitHub Actions — ver [`../docs/de
 
 O controle de acesso segue o RBAC em [`../docs/seguranca/rbac.md`](../docs/seguranca/rbac.md)
 (permissões no formato `MODULO:ACAO`, tipadas em `src/auth/permissions.ts`).
+
+## Design system
+
+O estilo tem fonte única: o tema MUI em `src/theme.ts` (`ThemeProvider` +
+`CssBaseline` montados em `src/App.tsx`). **Use tokens do tema (palette/spacing via
+`sx`), não cores/medidas soltas**, e reaproveite `src/components/common/`. Paleta,
+tokens e convenções em [`docs/design-system.md`](docs/design-system.md).
