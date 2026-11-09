@@ -6,6 +6,7 @@ import { createTheme } from '@mui/material/styles'
 const BROWN = '#5B3A21' // marrom principal (botões, títulos)
 const BROWN_DARK = '#4A2F17' // texto/variações escuras
 const SUNFLOWER = '#F2B705' // amarelo girassol
+const AMBER = '#E9A83C' // âmbar da barra superior (HomeAdmin/BarraLateral)
 const CREAM_BG = '#F4E9CC' // fundo creme da aplicação
 const CREAM_PAPER = '#FBF6E9' // superfícies (campos, cards)
 
@@ -24,6 +25,27 @@ export const theme = createTheme({
     button: { textTransform: 'none', fontWeight: 600 },
   },
   components: {
+    // Botões em formato "pílula", como no wireframe (Entrar, ações).
+    MuiButton: {
+      defaultProps: { disableElevation: true },
+      styleOverrides: {
+        root: { borderRadius: 999 },
+      },
+    },
+    // Barra superior em âmbar com texto/ícones marrons (HomeAdmin/BarraLateral).
+    MuiAppBar: {
+      defaultProps: { elevation: 0, color: 'default' },
+      styleOverrides: {
+        root: { backgroundColor: AMBER, color: BROWN_DARK },
+      },
+    },
+    // Superfícies em creme, com cantos arredondados do tema.
+    MuiCard: {
+      defaultProps: { elevation: 0 },
+      styleOverrides: {
+        root: { backgroundColor: CREAM_PAPER, border: `1px solid ${AMBER}33` },
+      },
+    },
     // Campos arredondados e com fundo "paper", como no wireframe.
     MuiTextField: {
       defaultProps: { variant: 'outlined', fullWidth: true },

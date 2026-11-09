@@ -133,7 +133,7 @@ export function LoginPage() {
               size="large"
               disabled={enviando}
               endIcon={<ArrowForwardIcon />}
-              sx={{ mt: 1, borderRadius: 999, py: 1.5 }}
+              sx={{ mt: 1, py: 1.5 }}
             >
               {enviando ? 'Entrando…' : 'Entrar'}
             </Button>
