@@ -249,7 +249,7 @@ export function PaginatedList<T>({
     )
   }
 
-  function renderResults(): ReactNode {
+    function renderResults(): ReactNode {
     if (loading) {
       return loadingState ?? <LoadingState message="Carregando listagem..." />
     }
@@ -278,9 +278,43 @@ export function PaginatedList<T>({
     }
 
     return (
-      <TableContainer>
-        <Table aria-label="Listagem de registros">
-          <TableHead>
+      <TableContainer
+        sx={{
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'primary.main',
+          borderRadius: 2,
+          overflowX: 'auto',
+        }}
+      >
+        <Table
+          aria-label="Listagem de registros"
+          sx={{
+            '& th, & td': { borderColor: 'divider' },
+            '& tbody tr:last-child td': { borderBottom: 0 },
+            '& tbody tr:nth-of-type(even)': {
+              bgcolor: 'action.hover',
+            },
+          }}
+        >
+          <TableHead
+            sx={{
+              bgcolor: 'primary.main',
+              '& .MuiTableCell-root': {
+                color: 'primary.contrastText',
+                fontWeight: 700,
+              },
+              '& .MuiTableSortLabel-root': {
+                color: 'inherit',
+                '&:hover, &.Mui-active, &.Mui-focusVisible': {
+                  color: 'inherit',
+                },
+                '& .MuiTableSortLabel-icon': {
+                  color: 'inherit !important',
+                },
+              },
+            }}
+          >
             <TableRow>
               {columns.map((column) => (
                 <TableCell
@@ -334,6 +368,7 @@ export function PaginatedList<T>({
                 {onItemClick && (
                   <TableCell>
                     <Button
+                      variant="outlined"
                       onClick={(event) => {
                         event.stopPropagation()
                         onItemClick(item)
@@ -357,7 +392,14 @@ export function PaginatedList<T>({
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           spacing={2}
-          sx={{ flexWrap: 'wrap' }}
+          useFlexGap
+          sx={{
+            flexWrap: 'wrap',
+            '& > .MuiTextField-root': {
+              flex: { xs: '0 1 auto', sm: '1 1 180px' },
+              minWidth: 0,
+            },
+          }}
         >
           {filters.map((filter) => (
             <TextField
@@ -482,6 +524,7 @@ export function PaginatedList<T>({
 
         {!loading && !error && data && data.totalPages > 0 && (
           <Pagination
+            variant="outlined"
             count={data.totalPages}
             page={page + 1}
             onChange={(_, value) => setPage(value - 1)}

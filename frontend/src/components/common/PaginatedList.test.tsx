@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { PaginatedList as Page } from '../../api/pagination'
 import { PaginatedList } from './PaginatedList'
@@ -52,13 +52,13 @@ describe('PaginatedList — contrato da #29 e feedback da #27', () => {
     await screen.findByText('Registro Alfa')
 
     const input = screen.getByRole('textbox', { name: 'Buscar por nome' })
-    input.focus()
+    act(() => { input.focus() })
     fireEvent.change(input, { target: { value: 'inexistente' } })
     expect(await screen.findByText('Carregando listagem...')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Buscar por nome' })).toBe(input)
     expect(input).toHaveFocus()
 
-    completeSearch?.(response(page([])))
+    await act(async () => { completeSearch?.(response(page([]))) })
     expect(await screen.findByText('Nenhum registro encontrado')).toBeInTheDocument()
     expect(input).toHaveFocus()
 

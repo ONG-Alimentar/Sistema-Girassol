@@ -1,3 +1,5 @@
+import { lazy, Suspense } from 'react'
+import { LoadingState } from './components/common/LoadingState'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { PermissionGuard } from './auth/PermissionGuard.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
@@ -8,6 +10,10 @@ import { ForbiddenPage } from './pages/ForbiddenPage.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
 import { ModulePlaceholder } from './pages/ModulePlaceholder.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
+
+// Exemplos carregados apenas em desenvolvimento, sem entrar no menu de produção.
+const ExampleListPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleListPage').then((module) => ({ default: module.ExampleListPage }))) : () => null
+const ExampleDetailPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleDetailPage').then((module) => ({ default: module.ExampleDetailPage }))) : () => null
 
 interface ModuleRoute {
   path: string
@@ -35,6 +41,12 @@ export function AppRoutes() {
 
       {/* Autenticadas: RequireAuth protege todo o grupo */}
       <Route element={<RequireAuth />}>
+        {import.meta.env.DEV && (
+          <>
+            <Route path="examples/listagem" element={<Suspense fallback={<LoadingState />}><ExampleListPage /></Suspense>} />
+            <Route path="examples/listagem/:id" element={<Suspense fallback={<LoadingState />}><ExampleDetailPage /></Suspense>} />
+          </>
+        )}
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
           {MODULES.map((m) => (

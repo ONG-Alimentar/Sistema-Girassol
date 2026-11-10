@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,6 +71,17 @@ public class ExampleListController {
         );
 
         return PaginatedList.from(page, Function.identity());
+    }
+
+    /** Leitura do fixture para demonstrar a navegação da listagem, sem CRUD de domínio. */
+    @GetMapping("/{id}")
+    public ExampleListItem detail(@PathVariable Long id) {
+        return ITEMS.stream()
+            .filter(item -> item.id().equals(id))
+            .findFirst()
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Registro de exemplo não encontrado."
+            ));
     }
 
     private Comparator<ExampleListItem> buildComparator(Sort sort) {

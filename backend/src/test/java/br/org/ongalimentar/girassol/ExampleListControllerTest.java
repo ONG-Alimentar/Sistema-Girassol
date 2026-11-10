@@ -28,6 +28,22 @@ class ExampleListControllerTest {
     }
 
     @Test
+    void shouldReturnExampleDetail() throws Exception {
+        mockMvc.perform(get("/api/examples/listagem/2"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(2))
+            .andExpect(jsonPath("$.name").value("Registro Beta"));
+    }
+
+    @Test
+    void shouldReturnApiErrorForMissingExample() throws Exception {
+        mockMvc.perform(get("/api/examples/listagem/999"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.message").value("Registro de exemplo não encontrado."));
+    }
+
+    @Test
     void shouldReturnPaginatedList() throws Exception {
         mockMvc.perform(get("/api/examples/listagem")
                 .param("page", "0")
