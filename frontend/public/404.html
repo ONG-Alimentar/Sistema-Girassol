@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sistema Girassol</title>
+    <!--
+      SPA no GitHub Pages: o Pages não tem roteamento de servidor, então
+      deep-links (/login, reload, bookmark) caem aqui. Este script codifica o
+      caminho pedido na query e redireciona para o index.html, que o restaura
+      (ver o script em index.html). Assim a página final responde 200.
+      Técnica spa-github-pages (rafgraph, MIT): https://github.com/rafgraph/spa-github-pages
+
+      pathSegmentsToKeep = 1 porque o app é servido num subpath de projeto
+      (/Sistema-Girassol/): mantém o 1º segmento e reescreve o resto.
+    -->
+    <script type="text/javascript">
+      var pathSegmentsToKeep = 1
+
+      var l = window.location
+      l.replace(
+        l.protocol +
+          '//' +
+          l.hostname +
+          (l.port ? ':' + l.port : '') +
+          l.pathname
+            .split('/')
+            .slice(0, 1 + pathSegmentsToKeep)
+            .join('/') +
+          '/?/' +
+          l.pathname
+            .slice(1)
+            .split('/')
+            .slice(pathSegmentsToKeep)
+            .join('/')
+            .replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash,
+      )
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -4,10 +4,13 @@
 # Requer um secret PROJECTS_TOKEN: um Personal Access Token com permissão de
 # escrita em Projects da org (o GITHUB_TOKEN padrão não escreve em Projects de
 # organização). Ver README de deploy / instruções abaixo.
+#
+# pull_request_target para que PR de fork também tenha acesso ao secret.
+# Seguro aqui pq o job não faz checkout nem roda código da PR — só chama a API.
 name: Project — mover PR para In review
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, ready_for_review, review_requested]
 
 # Evita corridas quando vários eventos da mesma PR chegam juntos.
@@ -15,18 +18,26 @@ concurrency:
   group: project-in-review-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
+# Sem permissões extras no GITHUB_TOKEN; o job usa só o PROJECTS_TOKEN.
+permissions: {}
+
 jobs:
   in-review:
     runs-on: ubuntu-latest
+    # secrets não pode ser lido no if de job, então mapeia pra env aqui.
+    env:
+      HAS_TOKEN: ${{ secrets.PROJECTS_TOKEN != '' }}
     steps:
       - name: Adicionar a PR ao Project
         id: add
+        if: env.HAS_TOKEN == 'true'
         uses: actions/add-to-project@v1.0.2
         with:
           project-url: https://github.com/orgs/ONG-Alimentar/projects/3
           github-token: ${{ secrets.PROJECTS_TOKEN }}
 
       - name: Setar Status = In review
+        if: env.HAS_TOKEN == 'true'
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           ITEM_ID: ${{ steps.add.outputs.itemId }}
