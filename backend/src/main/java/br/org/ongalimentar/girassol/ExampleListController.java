@@ -3,6 +3,7 @@ package br.org.ongalimentar.girassol;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.org.ongalimentar.girassol.dto.ExampleListItem;
-import br.org.ongalimentar.girassol.dto.PaginatedList;
+import br.org.ongalimentar.girassol.common.crud.PaginatedList;
 
 @RestController
 @RequestMapping("/api/examples/listagem")
@@ -68,7 +69,7 @@ public class ExampleListController {
             filtered.size()
         );
 
-        return PaginatedList.from(page);
+        return PaginatedList.from(page, Function.identity());
     }
 
     private Comparator<ExampleListItem> buildComparator(Sort sort) {

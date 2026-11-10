@@ -1,13 +1,11 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
-  Alert,
   Box,
   Button,
   Card,
   CardActionArea,
   CardContent,
-  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -29,6 +27,10 @@ import { apiFetch } from '../../api/client'
 import type {
   PaginatedList as PaginatedListResponse,
 } from '../../api/pagination'
+
+import { LoadingState } from './LoadingState'
+import { EmptyState } from './EmptyState'
+import { ErrorState } from './ErrorState'
 
 export interface ListColumn<T> {
   label: string
@@ -248,40 +250,22 @@ export function PaginatedList<T>({
   }
 
   function renderResults(): ReactNode {
-    // Fallbacks provisórios até a integração com a #27.
     if (loading) {
-      return loadingState ?? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-          <CircularProgress aria-label="Carregando listagem" />
-        </Box>
-      )
+      return loadingState ?? <LoadingState message="Carregando listagem..." />
     }
 
     if (error) {
-      return errorState ? (
-        errorState(error, retry)
-      ) : (
-        <Alert
-          severity="error"
-          action={
-            <Button color="inherit" onClick={retry}>
-              Tentar novamente
-            </Button>
-          }
-        >
-          {error.message}
-        </Alert>
-      )
+      return errorState
+        ? errorState(error, retry)
+        : <ErrorState message={error.message} onRetry={retry} />
     }
 
     if (!data || data.content.length === 0) {
       return emptyState ?? (
-        <Typography
-          role="status"
-          sx={{ color: 'text.secondary', textAlign: 'center', p: 4 }}
-        >
-          Nenhum registro encontrado.
-        </Typography>
+        <EmptyState
+          title="Nenhum registro encontrado"
+          description="Não há registros para os filtros atuais."
+        />
       )
     }
 
