@@ -1,7 +1,9 @@
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import { BrowserRouter } from 'react-router-dom';
 import { AppRoutes } from './AppRoutes.tsx';
 import { AuthProvider } from './auth/AuthProvider.tsx';
 import { ToastProvider } from './context/ToastProvider.tsx';
+import { theme } from './theme.ts';
 
 /**
  * Raiz da aplicação: router + providers + rotas. Extraída de main.tsx para ser
@@ -17,12 +19,15 @@ import { ToastProvider } from './context/ToastProvider.tsx';
  */
 export function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <ToastProvider>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </ToastProvider>
-    </BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <ToastProvider>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </ToastProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
