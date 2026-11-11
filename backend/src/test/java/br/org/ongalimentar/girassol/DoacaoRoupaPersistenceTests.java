@@ -1,6 +1,7 @@
 package br.org.ongalimentar.girassol;
 
 import br.org.ongalimentar.girassol.doacaoroupa.DoacaoRoupa;
+import br.org.ongalimentar.girassol.doacaoroupa.DoacaoRoupaRepository;
 import br.org.ongalimentar.girassol.doacaoroupa.PecaRoupa;
 import br.org.ongalimentar.girassol.familia.Familia;
 import br.org.ongalimentar.girassol.familia.Genero;
@@ -8,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 @SpringBootTest
 @Transactional
 class DoacaoRoupaPersistenceTests {
+
+	@Autowired
+	private DoacaoRoupaRepository repository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -54,13 +59,13 @@ class DoacaoRoupaPersistenceTests {
 		doacaoRoupa.addPecaRoupa(calca);
 		doacaoRoupa.addPecaRoupa(casaco);
 
-		entityManager.persist(doacaoRoupa);
+		repository.save(doacaoRoupa);
 		entityManager.flush();
 		Long doacaoRoupaId = doacaoRoupa.getId();
 
 		entityManager.clear();
 
-		DoacaoRoupa persistida = entityManager.find(DoacaoRoupa.class, doacaoRoupaId);
+		DoacaoRoupa persistida = repository.findById(doacaoRoupaId).orElseThrow();
 
 		assertNotNull(persistida);
 		assertEquals(LocalDate.of(2026, 11, 8), persistida.getData());
@@ -70,6 +75,9 @@ class DoacaoRoupaPersistenceTests {
 		assertEquals("Camiseta", persistida.getPecas().getFirst().getDescricao());
 		assertEquals("M", persistida.getPecas().getFirst().getTamanho());
 		assertEquals(Genero.MASCULINO, persistida.getPecas().getFirst().getGenero());
+		repository.delete(persistida);
+		repository.flush();
+		assertEquals(false, repository.existsById(doacaoRoupaId));
 	}
 
 	@Test

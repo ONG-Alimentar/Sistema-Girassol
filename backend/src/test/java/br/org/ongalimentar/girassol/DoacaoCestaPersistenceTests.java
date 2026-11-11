@@ -1,12 +1,14 @@
 package br.org.ongalimentar.girassol;
 
 import br.org.ongalimentar.girassol.doacaocesta.DoacaoCesta;
+import br.org.ongalimentar.girassol.doacaocesta.DoacaoCestaRepository;
 import br.org.ongalimentar.girassol.doacaocesta.ItemCesta;
 import br.org.ongalimentar.girassol.familia.Familia;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 @Transactional
 class DoacaoCestaPersistenceTests {
 
+	@Autowired
+	private DoacaoCestaRepository repository;
+
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -41,13 +46,13 @@ class DoacaoCestaPersistenceTests {
 		doacaoCesta.addItem(new ItemCesta("Feijão", BigDecimal.valueOf(1.5)));
 		doacaoCesta.addItem(new ItemCesta("Óleo", 1));
 
-		entityManager.persist(doacaoCesta);
+		repository.save(doacaoCesta);
 		entityManager.flush();
 		Long doacaoCestaId = doacaoCesta.getId();
 
 		entityManager.clear();
 
-		DoacaoCesta persistida = entityManager.find(DoacaoCesta.class, doacaoCestaId);
+		DoacaoCesta persistida = repository.findById(doacaoCestaId).orElseThrow();
 
 		assertNotNull(persistida);
 		assertEquals(LocalDate.of(2026, 11, 8), persistida.getData());
@@ -56,6 +61,9 @@ class DoacaoCestaPersistenceTests {
 		assertEquals("Arroz", persistida.getItens().getFirst().getDescricao());
 		assertEquals(0, BigDecimal.ONE.compareTo(persistida.getItens().getFirst().getQuantidade()));
 		assertEquals(0, BigDecimal.valueOf(1.5).compareTo(persistida.getItens().get(1).getQuantidade()));
+		repository.delete(persistida);
+		repository.flush();
+		assertEquals(false, repository.existsById(doacaoCestaId));
 	}
 
 	@Test
