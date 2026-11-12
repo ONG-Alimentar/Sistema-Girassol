@@ -16,6 +16,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import type { BaseFieldProps } from '../types';
 
+// Key por identidade do item, não por índice: ao remover um item do meio, o
+// índice faz o React reaproveitar a linha errada. onChange preserva as
+// referências dos itens não alterados, então a key fica estável. O WeakMap não
+// impede a coleta dos itens já removidos.
+const itemKeys = new WeakMap<object, number>();
+let nextItemKey = 0;
+function keyFor(item: object) {
+  let key = itemKeys.get(item);
+  if (key === undefined) {
+    key = nextItemKey++;
+    itemKeys.set(item, key);
+  }
+  return key;
+}
+
 interface RepeaterProps<T> extends BaseFieldProps<T[]> {
   createEmpty: () => T;
   getItemLabel: (item: T) => string;
@@ -96,7 +111,7 @@ export function Repeater<T>({
       <Stack spacing={1} sx={{ mt: 1 }}>
         {value.map((item, index) => (
           <Paper
-            key={index}
+            key={keyFor(item as object)}
             variant="outlined"
             sx={{
               p: 2,

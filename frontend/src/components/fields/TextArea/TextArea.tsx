@@ -29,7 +29,7 @@ export function TextArea({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       error={Boolean(error)}
-      helperText={error}
+      helperText={error || ' '}
       disabled={disabled}
       required={required}
       placeholder={placeholder}

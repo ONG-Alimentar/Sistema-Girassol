@@ -39,9 +39,7 @@ export function DateInput({
           size: 'small',
           required,
           error: Boolean(error) || pickerError,
-          helperText: error || (
-            pickerError ? 'Informe uma data válida.' : undefined
-          ),
+          helperText: error || (pickerError ? 'Informe uma data válida.' : ' '),
         },
       }}
     />
