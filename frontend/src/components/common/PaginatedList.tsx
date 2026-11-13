@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
   Box,
@@ -31,6 +31,10 @@ import type {
 import { LoadingState } from './LoadingState'
 import { EmptyState } from './EmptyState'
 import { ErrorState } from './ErrorState'
+
+// Filtros de texto aguardam a digitação parar antes de consultar o servidor;
+// os de data, por serem discretos, são aplicados na hora.
+const TEXT_FILTER_DEBOUNCE_MS = 300
 
 export interface ListColumn<T> {
   label: string
@@ -87,8 +91,15 @@ export function PaginatedList<T>({
   const [size, setSize] = useState(initialPageSize)
   const [sortField, setSortField] = useState('')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  // filterValues: o que o campo exibe (imediato). appliedFilters: o que vai à
+  // consulta (texto entra com debounce, data imediatamente).
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({})
   const [refresh, setRefresh] = useState(0)
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  useEffect(() => () => clearTimeout(debounceRef.current), [])
 
   // Inclui o tamanho inicial mesmo se ele não estiver nas opções recebidas.
   const availablePageSizes = Array.from(
@@ -115,7 +126,7 @@ export function PaginatedList<T>({
 
         const params = new URLSearchParams(existingQuery)
 
-        Object.entries(filterValues).forEach(([param, value]) => {
+        Object.entries(appliedFilters).forEach(([param, value]) => {
           const normalizedValue = value.trim()
 
           if (normalizedValue) {
@@ -174,16 +185,25 @@ export function PaginatedList<T>({
     size,
     sortField,
     sortDirection,
-    filterValues,
+    appliedFilters,
     refresh,
   ])
 
-  function updateFilter(param: string, value: string) {
-    setFilterValues((current) => ({
-      ...current,
-      [param]: value,
-    }))
-    setPage(0)
+  function updateFilter(filter: ListFilter, value: string) {
+    const next = { ...filterValues, [filter.param]: value }
+    setFilterValues(next)
+
+    clearTimeout(debounceRef.current)
+
+    if (filter.type === 'text') {
+      debounceRef.current = setTimeout(() => {
+        setAppliedFilters(next)
+        setPage(0)
+      }, TEXT_FILTER_DEBOUNCE_MS)
+    } else {
+      setAppliedFilters(next)
+      setPage(0)
+    }
   }
 
   function updateSort(field: string) {
@@ -249,7 +269,7 @@ export function PaginatedList<T>({
     )
   }
 
-    function renderResults(): ReactNode {
+  function renderResults(): ReactNode {
     if (loading) {
       return loadingState ?? <LoadingState message="Carregando listagem..." />
     }
@@ -409,7 +429,7 @@ export function PaginatedList<T>({
               type={filter.type}
               value={filterValues[filter.param] ?? ''}
               onChange={(event) => (
-                updateFilter(filter.param, event.target.value)
+                updateFilter(filter, event.target.value)
               )}
               fullWidth
               size="small"
