@@ -1,5 +1,7 @@
 package br.org.ongalimentar.girassol.familia;
 
+import br.org.ongalimentar.girassol.doacaocesta.DoacaoCesta;
+import br.org.ongalimentar.girassol.doacaoroupa.DoacaoRoupa;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -84,6 +86,12 @@ public class Familia {
 			joinColumns = @JoinColumn(name = "familia_id"),
 			inverseJoinColumns = @JoinColumn(name = "servico_id"))
 	private Set<Servico> servicos = new HashSet<>();
+
+	@OneToMany(mappedBy = "familia", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<DoacaoCesta> doacoesCestas = new ArrayList<>();
+
+	@OneToMany(mappedBy = "familia", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<DoacaoRoupa> doacoesRoupas = new ArrayList<>();
 
 	public Familia() {
 	}
@@ -316,6 +324,36 @@ public class Familia {
 	public void removeServico(Servico servico) {
 		if (servicos.remove(servico)) {
 			servico.getFamilias().remove(this);
+		}
+	}
+
+	public List<DoacaoRoupa> getDoacoesRoupas() {
+		return doacoesRoupas;
+	}
+
+	public void addDoacaoRoupa(DoacaoRoupa doacaoRoupa) {
+		doacoesRoupas.add(doacaoRoupa);
+		doacaoRoupa.setFamilia(this);
+	}
+
+	public void removeDoacaoRoupa(DoacaoRoupa doacaoRoupa) {
+		if (doacoesRoupas.remove(doacaoRoupa)) {
+			doacaoRoupa.setFamilia(null);
+		}
+	}
+
+	public List<DoacaoCesta> getDoacoesCestas() {
+		return doacoesCestas;
+	}
+
+	public void addDoacaoCesta(DoacaoCesta doacaoCesta) {
+		doacoesCestas.add(doacaoCesta);
+		doacaoCesta.setFamilia(this);
+	}
+
+	public void removeDoacaoCesta(DoacaoCesta doacaoCesta) {
+		if (doacoesCestas.remove(doacaoCesta)) {
+			doacaoCesta.setFamilia(null);
 		}
 	}
 }
