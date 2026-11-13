@@ -15,49 +15,49 @@ import java.math.BigDecimal;
 @Table(name = "itens_doados")
 public class ItemCesta {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false)
-    private String descricao; // Talvez, seria interessante adicionar a unidade de medida como atributo, ao invés de precisar ser declarada junto a descrição. Ex como está: Arroz (kg), a ideia seria separar em dois campos distintos.
+	@Column(nullable = false)
+	private String descricao;
 
 	@Column(nullable = false, precision = 10, scale = 3)
 	private BigDecimal quantidade;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "doacao_cesta_id", nullable = false)
-    private DoacaoCesta doacaoCesta;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "doacao_cesta_id", nullable = false)
+	private DoacaoCesta doacaoCesta;
 
-    public ItemCesta() {
-    }
-
-    public ItemCesta(String descricao, BigDecimal quantidade) {
-        this.descricao = descricao;
-        this.quantidade = quantidade;
-    }
-
-	public ItemCesta(String descricao, int quantidade) {
-		this.descricao = descricao;
-		this.quantidade = BigDecimal.valueOf(quantidade);
+	public ItemCesta() {
 	}
 
-    public Long getId() {
-        return id;
-    }
+	public ItemCesta(String descricao, BigDecimal quantidade) {
+		this.descricao = descricao;
+		setQuantidade(quantidade);
+	}
 
-    public String getDescricao() {
-        return descricao;
-    }
+	public ItemCesta(String descricao, int quantidade) {
+		this(descricao, BigDecimal.valueOf(quantidade));
+	}
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+	public Long getId() {
+		return id;
+	}
 
-	public BigDecimal getQuantidade() { return quantidade; }
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public BigDecimal getQuantidade() {
+		return quantidade;
+	}
 
 	public void setQuantidade(BigDecimal quantidade) {
-		// quantidade == null ou quantidade <= 0
 		if (quantidade == null || quantidade.compareTo(BigDecimal.ZERO) <= 0) {
 			throw new IllegalArgumentException("A quantidade do item doado deve ser maior que zero.");
 		}
@@ -65,11 +65,11 @@ public class ItemCesta {
 		this.quantidade = quantidade;
 	}
 
-    public DoacaoCesta getDoacaoCesta() {
-        return doacaoCesta;
-    }
+	public DoacaoCesta getDoacaoCesta() {
+		return doacaoCesta;
+	}
 
-    public void setDoacaoCesta(DoacaoCesta doacaoCesta) {
-        this.doacaoCesta = doacaoCesta;
-    }
+	public void setDoacaoCesta(DoacaoCesta doacaoCesta) {
+		this.doacaoCesta = doacaoCesta;
+	}
 }

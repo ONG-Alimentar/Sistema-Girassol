@@ -2,7 +2,6 @@ package br.org.ongalimentar.girassol.familia;
 
 import br.org.ongalimentar.girassol.doacaocesta.DoacaoCesta;
 import br.org.ongalimentar.girassol.doacaoroupa.DoacaoRoupa;
-import br.org.ongalimentar.girassol.doacaoroupa.PecaRoupa;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
