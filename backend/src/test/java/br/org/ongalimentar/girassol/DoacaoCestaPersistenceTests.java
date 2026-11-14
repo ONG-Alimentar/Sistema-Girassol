@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -63,7 +64,7 @@ class DoacaoCestaPersistenceTests {
 		assertEquals(0, BigDecimal.valueOf(1.5).compareTo(persistida.getItens().get(1).getQuantidade()));
 		repository.delete(persistida);
 		repository.flush();
-		assertEquals(false, repository.existsById(doacaoCestaId));
+		assertFalse(repository.existsById(doacaoCestaId));
 	}
 
 	@Test

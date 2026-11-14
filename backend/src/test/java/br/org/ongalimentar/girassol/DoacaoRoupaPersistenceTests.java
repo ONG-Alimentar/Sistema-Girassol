@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -77,7 +78,7 @@ class DoacaoRoupaPersistenceTests {
 		assertEquals(Genero.MASCULINO, persistida.getPecas().getFirst().getGenero());
 		repository.delete(persistida);
 		repository.flush();
-		assertEquals(false, repository.existsById(doacaoRoupaId));
+		assertFalse(repository.existsById(doacaoRoupaId));
 	}
 
 	@Test
