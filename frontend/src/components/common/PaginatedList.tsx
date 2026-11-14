@@ -8,6 +8,7 @@ import {
   CardContent,
   FormControl,
   InputLabel,
+  InputAdornment,
   MenuItem,
   Pagination,
   Select,
@@ -48,6 +49,8 @@ export interface ListFilter {
   // page, size e sort são reservados ao componente.
   param: string
   type: 'text' | 'date'
+  placeholder?: string
+  startAdornment?: ReactNode
 }
 
 interface PaginatedListProps<T> {
@@ -426,6 +429,7 @@ export function PaginatedList<T>({
               key={filter.param}
               id={`${listId}-filter-${filter.param}`}
               label={filter.label}
+              placeholder={filter.placeholder}
               type={filter.type}
               value={filterValues[filter.param] ?? ''}
               onChange={(event) => (
@@ -434,6 +438,9 @@ export function PaginatedList<T>({
               fullWidth
               size="small"
               slotProps={{
+                input: filter.startAdornment ? {
+                  startAdornment: <InputAdornment position="start">{filter.startAdornment}</InputAdornment>,
+                } : undefined,
                 inputLabel: filter.type === 'date'
                   ? { shrink: true }
                   : undefined,
