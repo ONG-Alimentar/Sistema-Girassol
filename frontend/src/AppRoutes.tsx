@@ -3,7 +3,7 @@ import { LoadingState } from './components/common/LoadingState'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { PermissionGuard } from './auth/PermissionGuard.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
-import type { Permission } from './auth/permissions.ts'
+import { MODULES } from './navigation/modules.ts'
 import { AppLayout } from './layouts/AppLayout.tsx'
 import { DashboardPage } from './pages/DashboardPage.tsx'
 import { ForbiddenPage } from './pages/ForbiddenPage.tsx'
@@ -15,22 +15,9 @@ import { NotFoundPage } from './pages/NotFoundPage.tsx'
 const ExampleListPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleListPage').then((module) => ({ default: module.ExampleListPage }))) : () => null
 const ExampleDetailPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleDetailPage').then((module) => ({ default: module.ExampleDetailPage }))) : () => null
 
-interface ModuleRoute {
-  path: string
-  title: string
-  permission: Permission
-}
-
-// Módulos protegidos por permissão. Cada um vira uma rota cujo elemento é
+// Os módulos protegidos vêm do registro único em navigation/modules.ts
+// (compartilhado com o drawer e a home). Cada um vira uma rota cujo elemento é
 // envolvido por PermissionGuard (redirect → /403 quando falta a permissão).
-const MODULES: ModuleRoute[] = [
-  { path: 'familias', title: 'Famílias', permission: 'FAMILIA:READ' },
-  { path: 'cestas', title: 'Cestas', permission: 'CESTA:READ' },
-  { path: 'roupas', title: 'Roupas', permission: 'ROUPA:READ' },
-  { path: 'visitas', title: 'Visitas', permission: 'VISITA:READ' },
-  { path: 'juridico', title: 'Jurídico', permission: 'JURIDICO:READ' },
-  { path: 'psicologico', title: 'Psicológico', permission: 'PSICOLOGICO:READ' },
-]
 
 /** Árvore de rotas da aplicação. */
 export function AppRoutes() {
@@ -55,7 +42,7 @@ export function AppRoutes() {
               path={m.path}
               element={
                 <PermissionGuard permission={m.permission} redirect>
-                  <ModulePlaceholder title={m.title} />
+                  <ModulePlaceholder title={m.label} />
                 </PermissionGuard>
               }
             />
