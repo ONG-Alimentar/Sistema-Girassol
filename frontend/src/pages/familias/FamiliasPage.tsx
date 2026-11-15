@@ -53,7 +53,7 @@ export function FamiliasPage({ onOpenFamilia }: FamiliasPageProps) {
               <PersonOutlineIcon sx={{ fontSize: 44 }} aria-hidden="true" />
             </Avatar>
             <Box sx={{ minWidth: 0 }}>
-              <Typography component="h2" variant="h6" sx={{ lineHeight: 1.3, overflowWrap: 'anywhere' }}>
+              <Typography component="p" variant="h6" sx={{ lineHeight: 1.3, overflowWrap: 'anywhere' }}>
                 {familia.nome}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
