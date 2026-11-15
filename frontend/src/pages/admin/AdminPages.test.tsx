@@ -100,4 +100,39 @@ describe('Telas de administração RBAC (#3)', () => {
     expect(await screen.findByRole('heading', { name: 'Permissões' })).toBeInTheDocument()
     expect(await screen.findByText('FAMILIA:READ')).toBeInTheDocument()
   })
+
+  it('abre o detalhe de um usuário por id (DetailView)', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (input: string) => {
+      const url = new URL(input, 'http://localhost')
+      if (url.pathname === '/api/auth/me') {
+        return json({ id: 1, email: 'admin@ong.org', permissions: ['USUARIO:READ'] })
+      }
+      if (url.pathname === '/api/usuarios/7') return json(usuario)
+      throw new Error(`Endpoint inesperado: ${url.pathname}`)
+    }))
+    window.history.pushState({}, '', '/Sistema-Girassol/admin/usuarios/7')
+    await renderApp()
+
+    expect(await screen.findByRole('heading', { name: 'Detalhes do usuário' })).toBeInTheDocument()
+    expect(await screen.findByText('ana@ong.org')).toBeInTheDocument()
+    expect(screen.getByText('ADMINISTRADOR')).toBeInTheDocument()
+  })
+
+  it('navega da listagem para o detalhe ao clicar em Ver detalhes', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (input: string) => {
+      const url = new URL(input, 'http://localhost')
+      if (url.pathname === '/api/auth/me') {
+        return json({ id: 1, email: 'admin@ong.org', permissions: ['USUARIO:READ'] })
+      }
+      if (url.pathname === '/api/usuarios') return json(page([usuario]))
+      if (url.pathname === '/api/usuarios/7') return json(usuario)
+      throw new Error(`Endpoint inesperado: ${url.pathname}`)
+    }))
+    window.history.pushState({}, '', '/Sistema-Girassol/admin/usuarios')
+    await renderApp()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver detalhes' }))
+    expect(await screen.findByRole('heading', { name: 'Detalhes do usuário' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/Sistema-Girassol/admin/usuarios/7')
+  })
 })

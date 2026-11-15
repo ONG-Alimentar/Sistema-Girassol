@@ -1,4 +1,5 @@
 import { Stack, Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import type { PermissaoListItem } from '../../api/permissoes'
 import { EmptyState } from '../../components/common/EmptyState'
 import { PaginatedList, type ListColumn, type ListFilter } from '../../components/common/PaginatedList'
@@ -14,6 +15,7 @@ const filters: ListFilter[] = [{
 }]
 
 export function PermissoesPage() {
+  const navigate = useNavigate()
   return (
     <Stack spacing={3} sx={{ width: '100%', minWidth: 0 }}>
       <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
@@ -25,6 +27,7 @@ export function PermissoesPage() {
         filters={filters}
         mode="table"
         getItemKey={(permissao) => permissao.id}
+        onItemClick={(permissao) => navigate(`/admin/permissoes/${permissao.id}`)}
         emptyState={
           <EmptyState
             title="Nenhuma permissão encontrada"

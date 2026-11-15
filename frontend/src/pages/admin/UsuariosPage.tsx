@@ -1,4 +1,5 @@
 import { Chip, Stack, Typography } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import type { UsuarioListItem } from '../../api/usuarios'
 import { EmptyState } from '../../components/common/EmptyState'
 import { PaginatedList, type ListColumn, type ListFilter } from '../../components/common/PaginatedList'
@@ -44,6 +45,7 @@ const filters: ListFilter[] = [{
 }]
 
 export function UsuariosPage() {
+  const navigate = useNavigate()
   return (
     <Stack spacing={3} sx={{ width: '100%', minWidth: 0 }}>
       <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
@@ -55,6 +57,7 @@ export function UsuariosPage() {
         filters={filters}
         mode="table"
         getItemKey={(usuario) => usuario.id}
+        onItemClick={(usuario) => navigate(`/admin/usuarios/${usuario.id}`)}
         emptyState={
           <EmptyState
             title="Nenhum usuário encontrado"
