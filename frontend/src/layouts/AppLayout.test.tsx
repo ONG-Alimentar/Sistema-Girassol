@@ -40,6 +40,15 @@ describe('AppLayout — chrome mobile', () => {
     expect(screen.getByRole('button', { name: 'Mais' })).toBeInTheDocument()
   })
 
+  it('a aba Famílias da bottom bar respeita a permissão (Voluntário não a vê)', async () => {
+    await renderShellWith(['CESTA:READ', 'ROUPA:READ', 'VISITA:READ'])
+
+    // Início e Mais continuam; Famílias (exige FAMILIA:READ) some.
+    expect(await screen.findByRole('button', { name: 'Início' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mais' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Famílias' })).not.toBeInTheDocument()
+  })
+
   it('o hambúrguer abre o drawer com os módulos permitidos (Admin vê Usuários)', async () => {
     await renderShellWith(['CONTA:CREATE', 'FAMILIA:READ'])
 

@@ -154,12 +154,16 @@ export function AppLayout() {
             icon={<HomeIcon />}
             onClick={() => navigate('/')}
           />
-          <BottomNavigationAction
-            label="Famílias"
-            value="familias"
-            icon={<GroupsIcon />}
-            onClick={() => navigate('/familias')}
-          />
+          {/* A aba Famílias só aparece para quem tem a permissão — o drawer e a
+              home já filtram por can(); sem isto a aba levaria a /403. */}
+          {can('FAMILIA:READ') && (
+            <BottomNavigationAction
+              label="Famílias"
+              value="familias"
+              icon={<GroupsIcon />}
+              onClick={() => navigate('/familias')}
+            />
+          )}
           <BottomNavigationAction
             label="Mais"
             value="mais"
