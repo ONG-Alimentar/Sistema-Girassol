@@ -1,21 +1,29 @@
-import { hasPermission } from './permissions.ts'
-import type { Permission } from './permissions.ts'
-
 /**
  * Rótulo de Cargo exibido na saudação da home ("Olá, {cargo}!").
  *
- * Derivação TEMPORÁRIA a partir das permissões: o tipo Usuario ainda não traz o
- * cargo (ele vem do #18/#46). Quando o backend enviar o cargo real, basta trocar
- * esta função por uma leitura direta — o resto da UI não muda.
- *
- * A ordem importa: o Administrador tem TODAS as permissões (ver rbac.md), então
- * checamos do mais privilegiado para o menos para não rotulá-lo como outro cargo.
+ * Lê os cargos reais do usuário (enviados pelo backend em /login e /me — ver
+ * auth/UsuarioResponse.java e api/auth.ts). Quando o usuário tem mais de um cargo,
+ * saúda pelo de maior alcance (ordem de PRIORIDADE). Fallback "Usuário" quando não
+ * há cargo (ou é um nome fora do catálogo conhecido).
  */
-export function cargoLabel(perms: Permission[] | undefined): string {
-  if (hasPermission(perms, 'CONTA:CREATE')) return 'Admin'
-  if (hasPermission(perms, 'FAMILIA:READ')) return 'Assistente social'
-  if (hasPermission(perms, 'JURIDICO:READ')) return 'Jurídico'
-  if (hasPermission(perms, 'PSICOLOGICO:READ')) return 'Psicológico'
-  if (hasPermission(perms, ['CESTA:READ', 'ROUPA:READ', 'VISITA:READ'])) return 'Voluntário'
+const CARGO_LABELS: Record<string, string> = {
+  ADMINISTRADOR: 'Admin',
+  ASSISTENTE_SOCIAL: 'Assistente social',
+  ADVOGADA: 'Jurídico',
+  PSICOLOGO: 'Psicológico',
+  VOLUNTARIO_INTERNO: 'Voluntário',
+}
+
+// Do mais privilegiado para o menos — ver docs/seguranca/rbac.md.
+const PRIORIDADE = ['ADMINISTRADOR', 'ASSISTENTE_SOCIAL', 'ADVOGADA', 'PSICOLOGO', 'VOLUNTARIO_INTERNO']
+
+export function cargoLabel(cargos: string[] | undefined): string {
+  if (cargos && cargos.length > 0) {
+    for (const nome of PRIORIDADE) {
+      if (cargos.includes(nome)) return CARGO_LABELS[nome]
+    }
+    // Cargo fora do catálogo conhecido: mostra o próprio nome.
+    return CARGO_LABELS[cargos[0]] ?? cargos[0]
+  }
   return 'Usuário'
 }

@@ -8,9 +8,10 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * Representação do usuário autenticado devolvida por {@code /login} e {@code /me}.
  * O campo {@code permissions} traz as autoridades {@code MODULO:ACAO} que o front
- * usa nos guards — ver frontend/src/api/auth.ts.
+ * usa nos guards; {@code cargos} traz os nomes dos cargos (ex.: {@code ADMINISTRADOR})
+ * usados na saudação por cargo — ver frontend/src/api/auth.ts e auth/cargo.ts.
  */
-public record UsuarioResponse(Long id, String email, String nome, List<String> permissions) {
+public record UsuarioResponse(Long id, String email, String nome, List<String> permissions, List<String> cargos) {
 
 	public static UsuarioResponse from(Authentication authentication) {
 		AppUserDetails principal = (AppUserDetails) authentication.getPrincipal();
@@ -25,6 +26,7 @@ public record UsuarioResponse(Long id, String email, String nome, List<String> p
 				principal.getId(),
 				principal.getEmail(),
 				principal.getNome(),
-				permissions);
+				permissions,
+				principal.getCargos());
 	}
 }

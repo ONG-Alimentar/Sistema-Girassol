@@ -12,6 +12,7 @@ export interface TestUser {
   email?: string
   nome?: string
   permissions: Permission[]
+  cargos?: string[]
 }
 
 /** Monta uma Response JSON para stubs de fetch. */

@@ -26,7 +26,7 @@ describe('AppLayout — chrome mobile', () => {
   })
 
   it('o hambúrguer abre o drawer com os módulos permitidos (Admin vê Usuários)', async () => {
-    await renderAuthedApp({ me: { permissions: ['CONTA:CREATE', 'FAMILIA:READ'] } })
+    await renderAuthedApp({ me: { permissions: ['CONTA:CREATE', 'USUARIO:READ', 'FAMILIA:READ'] } })
 
     fireEvent.click(await screen.findByRole('button', { name: 'Abrir menu' }))
 

@@ -38,6 +38,15 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(body);
 	}
 
+	/** Validação condicional por campo (fora do @Valid) → 400 com erro por campo. */
+	@ExceptionHandler(FieldValidationException.class)
+	public ResponseEntity<ApiError> handleFieldValidation(FieldValidationException ex, HttpServletRequest req) {
+		ApiError body = new ApiError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+				HttpStatus.BAD_REQUEST.getReasonPhrase(), "Dados inválidos.", req.getRequestURI(),
+				List.of(new ApiError.FieldError(ex.getField(), ex.getMessage())));
+		return ResponseEntity.badRequest().body(body);
+	}
+
 	/** Sem permissão (@PreAuthorize) para usuário autenticado → 403. */
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex, HttpServletRequest req) {

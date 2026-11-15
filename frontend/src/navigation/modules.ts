@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react'
 import type { SvgIconComponent } from '@mui/icons-material'
 import Groups from '@mui/icons-material/Groups'
 import ShoppingBasket from '@mui/icons-material/ShoppingBasket'
@@ -8,7 +9,12 @@ import Psychology from '@mui/icons-material/Psychology'
 import Description from '@mui/icons-material/Description'
 import VolunteerActivism from '@mui/icons-material/VolunteerActivism'
 import ManageAccounts from '@mui/icons-material/ManageAccounts'
+import Badge from '@mui/icons-material/Badge'
+import Key from '@mui/icons-material/Key'
 import type { Permission } from '../auth/permissions.ts'
+import { UsuariosPage } from '../pages/admin/UsuariosPage'
+import { CargosPage } from '../pages/admin/CargosPage'
+import { PermissoesPage } from '../pages/admin/PermissoesPage'
 
 export interface ModuleDef {
   /** Segmento da rota, relativo ao layout autenticado (ex.: 'familias'). */
@@ -19,6 +25,11 @@ export interface ModuleDef {
   permission: Permission
   /** Ícone (MUI) usado no drawer e nos cards de atalho. */
   icon: SvgIconComponent
+  /**
+   * Página real da rota. Quando ausente, a rota usa o ModulePlaceholder (módulos
+   * ainda não implementados). Telas prontas (ex.: administração RBAC) fornecem aqui.
+   */
+  component?: ComponentType
 }
 
 /**
@@ -27,8 +38,9 @@ export interface ModuleDef {
  *
  * Jurídico e Psicológico ficam SEPARADOS de propósito: o RBAC isola esses
  * atendimentos (LGPD), então cada um só aparece para quem tem a permissão.
- * "Usuários" usa CONTA:CREATE — o único código do catálogo ligado a conta/admin
- * (ver docs/seguranca/rbac.md). PROJETO/FINANCEIRO ficam fora deste menu.
+ * A administração RBAC (#3) — Usuários, Cargos e Permissões — tem página real
+ * (component) e só aparece para o Administrador. PROJETO/FINANCEIRO ficam fora
+ * deste menu.
  */
 export const MODULES: ModuleDef[] = [
   { path: 'familias', label: 'Famílias', permission: 'FAMILIA:READ', icon: Groups },
@@ -39,5 +51,7 @@ export const MODULES: ModuleDef[] = [
   { path: 'psicologico', label: 'Psicológico', permission: 'PSICOLOGICO:READ', icon: Psychology },
   { path: 'documentacao', label: 'Documentação', permission: 'DOCUMENTACAO:READ', icon: Description },
   { path: 'voluntarios', label: 'Equipe de voluntários', permission: 'VOL_EXTERNO:READ', icon: VolunteerActivism },
-  { path: 'usuarios', label: 'Usuários', permission: 'CONTA:CREATE', icon: ManageAccounts },
+  { path: 'admin/usuarios', label: 'Usuários', permission: 'USUARIO:READ', icon: ManageAccounts, component: UsuariosPage },
+  { path: 'admin/cargos', label: 'Cargos', permission: 'CARGO:READ', icon: Badge, component: CargosPage },
+  { path: 'admin/permissoes', label: 'Permissões', permission: 'PERMISSAO:READ', icon: Key, component: PermissoesPage },
 ]

@@ -14,6 +14,8 @@ export interface Usuario {
   nome?: string
   /** Autoridades concedidas, no formato MODULO:ACAO. */
   permissions: Permission[]
+  /** Nomes dos cargos do usuário (ex.: ADMINISTRADOR), para a saudação por cargo. */
+  cargos?: string[]
 }
 
 /** Autentica o usuário. */

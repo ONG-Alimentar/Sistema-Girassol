@@ -14,6 +14,11 @@ export type Permission =
   | 'VISITA:READ' | 'VISITA:CREATE' | 'VISITA:DELETE'
   | 'JURIDICO:READ' | 'JURIDICO:CREATE' | 'JURIDICO:UPDATE' | 'JURIDICO:DELETE'
   | 'PSICOLOGICO:READ' | 'PSICOLOGICO:CREATE' | 'PSICOLOGICO:UPDATE' | 'PSICOLOGICO:DELETE'
+  // Administração RBAC (#3) — concedidas apenas ao ADMINISTRADOR.
+  // O catálogo de permissões é somente-leitura (acoplado ao código): só READ.
+  | 'USUARIO:READ' | 'USUARIO:CREATE' | 'USUARIO:UPDATE' | 'USUARIO:DELETE'
+  | 'CARGO:READ' | 'CARGO:CREATE' | 'CARGO:UPDATE' | 'CARGO:DELETE'
+  | 'PERMISSAO:READ'
 
 /**
  * Indica se a lista de permissões concede a(s) permissão(ões) exigida(s).

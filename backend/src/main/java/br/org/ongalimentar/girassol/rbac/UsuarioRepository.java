@@ -2,11 +2,12 @@ package br.org.ongalimentar.girassol.rbac;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+import br.org.ongalimentar.girassol.common.crud.BaseRepository;
+
+public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
 
 	boolean existsByEmail(String email);
 
@@ -22,4 +23,16 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 			where u.email = :email
 			""")
 	Optional<Usuario> findByEmailComAutoridades(@Param("email") String email);
+
+	/**
+	 * Conta usuários <b>ativos</b> cujo conjunto de cargos concede a permissão
+	 * {@code codigo}. Usado para garantir que sempre reste um administrador capaz
+	 * de gerir o RBAC (ver {@code UsuarioService}).
+	 */
+	@Query("""
+			select count(distinct u) from Usuario u
+			join u.cargos c join c.permissoes p
+			where u.ativo = true and p.codigo = :codigo
+			""")
+	long countAtivosComPermissao(@Param("codigo") String codigo);
 }

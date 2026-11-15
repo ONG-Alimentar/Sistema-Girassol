@@ -2,9 +2,9 @@ package br.org.ongalimentar.girassol.rbac;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import br.org.ongalimentar.girassol.common.crud.BaseRepository;
 
-public interface PermissaoRepository extends JpaRepository<Permissao, Long> {
+public interface PermissaoRepository extends BaseRepository<Permissao, Long> {
 
 	Optional<Permissao> findByCodigo(String codigo);
 }

@@ -1,28 +1,23 @@
 import { describe, expect, it } from 'vitest'
 import { cargoLabel } from './cargo.ts'
-import type { Permission } from './permissions.ts'
 
-describe('cargoLabel — rótulo de Cargo derivado das permissões', () => {
-  it('rotula como Admin quem tem CONTA:CREATE (precede os demais)', () => {
-    // Admin tem todas as permissões; mesmo com FAMILIA:READ deve ser "Admin".
-    const perms: Permission[] = ['CONTA:CREATE', 'FAMILIA:READ', 'JURIDICO:READ']
-    expect(cargoLabel(perms)).toBe('Admin')
+describe('cargoLabel — rótulo de Cargo a partir dos cargos reais', () => {
+  it('saúda pelo cargo de maior alcance quando há vários', () => {
+    expect(cargoLabel(['ASSISTENTE_SOCIAL', 'ADMINISTRADOR'])).toBe('Admin')
   })
 
-  it('rotula como Assistente social quem tem FAMILIA:READ sem CONTA:CREATE', () => {
-    expect(cargoLabel(['FAMILIA:READ', 'CESTA:READ'])).toBe('Assistente social')
+  it('mapeia cada cargo conhecido ao seu rótulo', () => {
+    expect(cargoLabel(['ASSISTENTE_SOCIAL'])).toBe('Assistente social')
+    expect(cargoLabel(['ADVOGADA'])).toBe('Jurídico')
+    expect(cargoLabel(['PSICOLOGO'])).toBe('Psicológico')
+    expect(cargoLabel(['VOLUNTARIO_INTERNO'])).toBe('Voluntário')
   })
 
-  it('rotula o jurídico e o psicológico pelos seus READ', () => {
-    expect(cargoLabel(['JURIDICO:READ'])).toBe('Jurídico')
-    expect(cargoLabel(['PSICOLOGICO:READ'])).toBe('Psicológico')
+  it('mostra o próprio nome para cargo fora do catálogo conhecido', () => {
+    expect(cargoLabel(['GERENTE'])).toBe('GERENTE')
   })
 
-  it('rotula como Voluntário quem só tem cestas/roupas/visitas', () => {
-    expect(cargoLabel(['CESTA:READ', 'ROUPA:READ', 'VISITA:READ'])).toBe('Voluntário')
-  })
-
-  it('cai no fallback "Usuário" sem permissões conhecidas', () => {
+  it('cai no fallback "Usuário" sem cargos', () => {
     expect(cargoLabel([])).toBe('Usuário')
     expect(cargoLabel(undefined)).toBe('Usuário')
   })

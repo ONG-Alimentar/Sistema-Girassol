@@ -13,7 +13,7 @@ export function DashboardPage() {
   const { user, can } = useAuth()
   const navigate = useNavigate()
 
-  const cargo = cargoLabel(user?.permissions)
+  const cargo = cargoLabel(user?.cargos)
   const shortcuts = MODULES.filter((m) => can(m.permission))
 
   return (
