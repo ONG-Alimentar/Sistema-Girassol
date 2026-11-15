@@ -14,6 +14,7 @@ import { ModulePlaceholder } from './pages/ModulePlaceholder.tsx'
 import { UsuarioDetailPage } from './pages/admin/UsuarioDetailPage'
 import { CargoDetailPage } from './pages/admin/CargoDetailPage'
 import { PermissaoDetailPage } from './pages/admin/PermissaoDetailPage'
+import { FamiliaDetailPage } from './pages/familias/FamiliaDetailPage.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 
 // Exemplos carregados apenas em desenvolvimento, sem entrar no menu de produção.
@@ -53,6 +54,16 @@ export function AppRoutes() {
         )}
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
+          {/* Detalhe-hub da família (#50). O /familias (listagem, #49) vem do
+              registro de MÓDULOS abaixo (placeholder até a PR da listagem). */}
+          <Route
+            path="familias/:id"
+            element={
+              <PermissionGuard permission="FAMILIA:READ" redirect>
+                <FamiliaDetailPage />
+              </PermissionGuard>
+            }
+          />
           {MODULES.map((m) => {
             const Page = m.component
             return (

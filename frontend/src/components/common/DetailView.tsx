@@ -30,6 +30,8 @@ interface DetailViewProps<T> {
   /** Ação "Editar": recebe o item carregado. Botão oculto quando ausente. */
   onEdit?: (item: T) => void
   editLabel?: string
+  /** Conteúdo extra (ações, hub, etc.) renderizado só quando o item carrega. */
+  renderActions?: (item: T) => ReactNode
 
   // Overrides dos estados compartilhados (#27).
   loadingState?: ReactNode
@@ -54,6 +56,7 @@ export function DetailView<T>({
   fields,
   onEdit,
   editLabel = 'Editar',
+  renderActions,
   loadingState,
   emptyState,
   errorState,
@@ -160,6 +163,8 @@ export function DetailView<T>({
           {editLabel}
         </Button>
       )}
+
+      {renderActions?.(item)}
     </Stack>
   )
 }
