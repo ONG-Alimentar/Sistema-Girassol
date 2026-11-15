@@ -53,7 +53,16 @@ ROUPA:READ|CREATE|DELETE
 VISITA:READ|CREATE|DELETE
 JURIDICO:READ|CREATE|UPDATE|DELETE
 PSICOLOGICO:READ|CREATE|UPDATE|DELETE
+
+USUARIO:READ|CREATE|UPDATE|DELETE     (Administrador)
+CARGO:READ|CREATE|UPDATE|DELETE       (Administrador)
+PERMISSAO:READ|CREATE|UPDATE|DELETE   (Administrador)
 ```
+
+> **Administração RBAC (#3):** as permissões `USUARIO:*`, `CARGO:*` e `PERMISSAO:*`
+> protegem o CRUD das próprias entidades de controle de acesso (telas de
+> administração). São concedidas **somente ao Administrador** — nenhum outro cargo
+> gere usuários, cargos ou o catálogo de permissões.
 
 Mapeamento cargo → permissões:
 

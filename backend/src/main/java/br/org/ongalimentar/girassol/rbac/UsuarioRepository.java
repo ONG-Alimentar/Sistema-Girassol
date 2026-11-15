@@ -2,11 +2,12 @@ package br.org.ongalimentar.girassol.rbac;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+import br.org.ongalimentar.girassol.common.crud.BaseRepository;
+
+public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
 
 	boolean existsByEmail(String email);
 

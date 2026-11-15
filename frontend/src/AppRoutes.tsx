@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import type { ReactNode } from 'react'
 import { LoadingState } from './components/common/LoadingState'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { PermissionGuard } from './auth/PermissionGuard.tsx'
@@ -9,6 +10,9 @@ import { DashboardPage } from './pages/DashboardPage.tsx'
 import { ForbiddenPage } from './pages/ForbiddenPage.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
 import { ModulePlaceholder } from './pages/ModulePlaceholder.tsx'
+import { UsuariosPage } from './pages/admin/UsuariosPage'
+import { CargosPage } from './pages/admin/CargosPage'
+import { PermissoesPage } from './pages/admin/PermissoesPage'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 
 // Exemplos carregados apenas em desenvolvimento, sem entrar no menu de produção.
@@ -20,6 +24,14 @@ interface ModuleRoute {
   title: string
   permission: Permission
 }
+
+// Telas de administração RBAC (#3): páginas reais (não placeholders), cada uma
+// protegida pela permissão de leitura da sua entidade.
+const ADMIN_ROUTES: { path: string; permission: Permission; element: ReactNode }[] = [
+  { path: 'admin/usuarios', permission: 'USUARIO:READ', element: <UsuariosPage /> },
+  { path: 'admin/cargos', permission: 'CARGO:READ', element: <CargosPage /> },
+  { path: 'admin/permissoes', permission: 'PERMISSAO:READ', element: <PermissoesPage /> },
+]
 
 // Módulos protegidos por permissão. Cada um vira uma rota cujo elemento é
 // envolvido por PermissionGuard (redirect → /403 quando falta a permissão).
@@ -56,6 +68,17 @@ export function AppRoutes() {
               element={
                 <PermissionGuard permission={m.permission} redirect>
                   <ModulePlaceholder title={m.title} />
+                </PermissionGuard>
+              }
+            />
+          ))}
+          {ADMIN_ROUTES.map((r) => (
+            <Route
+              key={r.path}
+              path={r.path}
+              element={
+                <PermissionGuard permission={r.permission} redirect>
+                  {r.element}
                 </PermissionGuard>
               }
             />

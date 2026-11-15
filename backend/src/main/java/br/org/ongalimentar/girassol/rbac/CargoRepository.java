@@ -2,9 +2,9 @@ package br.org.ongalimentar.girassol.rbac;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import br.org.ongalimentar.girassol.common.crud.BaseRepository;
 
-public interface CargoRepository extends JpaRepository<Cargo, Long> {
+public interface CargoRepository extends BaseRepository<Cargo, Long> {
 
 	Optional<Cargo> findByNome(String nome);
 }

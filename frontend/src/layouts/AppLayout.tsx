@@ -26,6 +26,10 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/visitas', label: 'Visitas', permission: 'VISITA:READ' },
   { to: '/juridico', label: 'Jurídico', permission: 'JURIDICO:READ' },
   { to: '/psicologico', label: 'Psicológico', permission: 'PSICOLOGICO:READ' },
+  // Administração RBAC (#3) — visível apenas ao Administrador.
+  { to: '/admin/usuarios', label: 'Usuários', permission: 'USUARIO:READ' },
+  { to: '/admin/cargos', label: 'Cargos', permission: 'CARGO:READ' },
+  { to: '/admin/permissoes', label: 'Permissões', permission: 'PERMISSAO:READ' },
 ]
 
 /**
