@@ -1,55 +1,76 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   AppBar,
   Box,
+  BottomNavigation,
+  BottomNavigationAction,
   Button,
   Container,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
   Toolbar,
   Typography,
 } from '@mui/material'
+import MenuIcon from '@mui/icons-material/Menu'
+import HomeIcon from '@mui/icons-material/Home'
+import GroupsIcon from '@mui/icons-material/Groups'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import LogoutIcon from '@mui/icons-material/Logout'
 import { SunflowerLogo } from '../components/brand/SunflowerLogo.tsx'
 import { useAuth } from '../auth/useAuth.ts'
-import type { Permission } from '../auth/permissions.ts'
+import { MODULES } from '../navigation/modules.ts'
 
-interface NavItem {
-  to: string
-  label: string
-  permission: Permission
-}
-
-// Itens de navegação e a permissão que cada um exige. O menu só mostra o que o
-// usuário pode acessar — a proteção real fica nas rotas (PermissionGuard).
-const NAV_ITEMS: NavItem[] = [
-  { to: '/familias', label: 'Famílias', permission: 'FAMILIA:READ' },
-  { to: '/cestas', label: 'Cestas', permission: 'CESTA:READ' },
-  { to: '/roupas', label: 'Roupas', permission: 'ROUPA:READ' },
-  { to: '/visitas', label: 'Visitas', permission: 'VISITA:READ' },
-  { to: '/juridico', label: 'Jurídico', permission: 'JURIDICO:READ' },
-  { to: '/psicologico', label: 'Psicológico', permission: 'PSICOLOGICO:READ' },
-  // Administração RBAC (#3) — visível apenas ao Administrador.
-  { to: '/admin/usuarios', label: 'Usuários', permission: 'USUARIO:READ' },
-  { to: '/admin/cargos', label: 'Cargos', permission: 'CARGO:READ' },
-  { to: '/admin/permissoes', label: 'Permissões', permission: 'PERMISSAO:READ' },
-]
+const BOTTOM_NAV_HEIGHT = 56
 
 /**
- * Layout das rotas autenticadas: barra superior (âmbar) com navegação + o
- * conteúdo da rota (<Outlet/>). O estilo vem todo do tema (src/theme.ts); a
- * estrutura/itens de navegação são do #30.
+ * Shell mobile das rotas autenticadas (wireframes BarraLateral/HomeAdmin):
+ * header "Sistema Girassol" com hambúrguer, drawer lateral com os módulos
+ * permitidos e bottom tab bar fixa (Início / Famílias / Mais). O conteúdo da
+ * rota entra no <Outlet/>. O estilo vem do tema (src/theme.ts); os itens de
+ * menu saem do registro único (navigation/modules.ts) filtrado por can().
  */
 export function AppLayout() {
   const { user, can, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const visibleModules = MODULES.filter((m) => can(m.permission))
 
   async function handleLogout() {
+    setDrawerOpen(false)
     await logout()
     navigate('/login', { replace: true })
   }
 
+  // Valor ativo da bottom bar: Início na raiz, Famílias na rota de famílias,
+  // senão "mais" (nenhum destaque forçado) para não acender Início fora dela.
+  const currentTab = location.pathname === '/'
+    ? 'inicio'
+    : location.pathname.startsWith('/familias')
+      ? 'familias'
+      : false
+
   return (
     <Box sx={{ minHeight: '100dvh', bgcolor: 'background.default' }}>
-      <AppBar position="static">
-        <Toolbar sx={{ gap: 2 }}>
+      <AppBar position="sticky">
+        <Toolbar sx={{ gap: 1 }}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="Abrir menu"
+            onClick={() => setDrawerOpen(true)}
+          >
+            <MenuIcon />
+          </IconButton>
+
           <Box
             component={NavLink}
             to="/"
@@ -57,51 +78,100 @@ export function AppLayout() {
               display: 'flex',
               alignItems: 'center',
               gap: 1,
+              flex: 1,
               color: 'inherit',
               textDecoration: 'none',
             }}
           >
-            <SunflowerLogo size={32} />
+            <SunflowerLogo size={28} />
             <Typography variant="h6" component="span" sx={{ fontWeight: 800 }}>
               Sistema Girassol
             </Typography>
           </Box>
 
-          <Box component="nav" sx={{ display: 'flex', gap: 0.5, flex: 1 }}>
-            {NAV_ITEMS.filter((item) => can(item.permission)).map((item) => (
-              <Button
-                key={item.to}
-                component={NavLink}
-                to={item.to}
-                color="inherit"
-                sx={{
-                  fontWeight: 600,
-                  '&.active': { bgcolor: 'rgba(74, 47, 23, 0.12)' },
-                }}
-              >
-                {item.label}
-              </Button>
-            ))}
-          </Box>
-
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {user?.nome ?? user?.email}
-          </Typography>
           <Button
             type="button"
             onClick={handleLogout}
-            variant="contained"
-            color="primary"
+            color="inherit"
             size="small"
+            startIcon={<LogoutIcon />}
           >
             Sair
           </Button>
         </Toolbar>
       </AppBar>
 
-      <Container component="main" maxWidth="lg" sx={{ py: 3 }}>
+      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+        <Box sx={{ width: 280 }} role="presentation">
+          <Box sx={{ p: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              {user?.nome ?? user?.email}
+            </Typography>
+          </Box>
+          <Divider />
+          <List>
+            {visibleModules.map((m) => {
+              const Icon = m.icon
+              return (
+                <ListItemButton
+                  key={m.path}
+                  component={NavLink}
+                  to={`/${m.path}`}
+                  onClick={() => setDrawerOpen(false)}
+                  sx={{ '&.active': { bgcolor: 'rgba(74, 47, 23, 0.12)' } }}
+                >
+                  <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
+                    <Icon />
+                  </ListItemIcon>
+                  <ListItemText primary={m.label} />
+                </ListItemButton>
+              )
+            })}
+          </List>
+        </Box>
+      </Drawer>
+
+      <Container
+        component="main"
+        maxWidth="lg"
+        sx={{ py: 3, pb: `calc(${BOTTOM_NAV_HEIGHT}px + 24px)` }}
+      >
         <Outlet />
       </Container>
+
+      <Paper
+        elevation={3}
+        sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: (t) => t.zIndex.appBar }}
+      >
+        <BottomNavigation
+          showLabels
+          value={currentTab}
+          sx={{ bgcolor: 'background.paper' }}
+        >
+          <BottomNavigationAction
+            label="Início"
+            value="inicio"
+            icon={<HomeIcon />}
+            onClick={() => navigate('/')}
+          />
+          {/* A aba Famílias só aparece para quem tem a permissão — o drawer e a
+              home já filtram por can(); sem isto a aba levaria a /403. */}
+          {can('FAMILIA:READ') && (
+            <BottomNavigationAction
+              label="Famílias"
+              value="familias"
+              icon={<GroupsIcon />}
+              onClick={() => navigate('/familias')}
+            />
+          )}
+          <BottomNavigationAction
+            label="Mais"
+            value="mais"
+            icon={<MoreHorizIcon />}
+            onClick={() => setDrawerOpen(true)}
+          />
+        </BottomNavigation>
+      </Paper>
     </Box>
   )
 }

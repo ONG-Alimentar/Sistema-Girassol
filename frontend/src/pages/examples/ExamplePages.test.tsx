@@ -1,6 +1,6 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { App } from '../../App'
+import { jsonResponse, renderAuthedApp } from '../../test/appRender.tsx'
 
 const item = {
   id: 2,
@@ -9,11 +9,27 @@ const item = {
   date: '2026-02-15',
 }
 
-const response = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  })
+/** Respostas das rotas de exemplo (as de /api/auth/me ficam no renderAuthedApp). */
+function examplesHandler(url: string): Response {
+  if (url.includes('/api/examples/listagem?')) {
+    return jsonResponse({
+      content: [item],
+      page: 0,
+      size: 3,
+      totalElements: 1,
+      totalPages: 1,
+      first: true,
+      last: true,
+      sort: 'UNSORTED',
+    })
+  }
+
+  if (url.endsWith('/api/examples/listagem/2')) {
+    return jsonResponse(item)
+  }
+
+  return jsonResponse({ message: 'Registro de exemplo não encontrado.' }, 404)
+}
 
 beforeAll(async () => {
   await Promise.all([
@@ -22,46 +38,9 @@ beforeAll(async () => {
   ])
 }, 60000)
 
-async function renderApp() {
-  await act(async () => {
-    render(<App />)
-  })
-}
-
 beforeEach(() => {
-  vi.stubEnv('BASE_URL', '/Sistema-Girassol/')
+  // As rotas de exemplo só existem em DEV; o renderAuthedApp cuida do BASE_URL.
   vi.stubEnv('DEV', true)
-
-  vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-    if (url.endsWith('/api/auth/me')) {
-      return response({
-        id: 1,
-        email: 'teste@example.org',
-        permissions: [],
-      })
-    }
-
-    if (url.includes('/api/examples/listagem?')) {
-      return response({
-        content: [item],
-        page: 0,
-        size: 3,
-        totalElements: 1,
-        totalPages: 1,
-        first: true,
-        last: true,
-        sort: 'UNSORTED',
-      })
-    }
-
-    if (url.endsWith('/api/examples/listagem/2')) {
-      return response(item)
-    }
-
-    return response({
-      message: 'Registro de exemplo não encontrado.',
-    }, 404)
-  }))
 })
 
 afterEach(() => {
@@ -72,8 +51,7 @@ afterEach(() => {
 
 describe('Demonstração autenticada da listagem', () => {
   it('navega do card ao detalhe via API e volta à listagem, respeitando o basename', async () => {
-    window.history.pushState({}, '', '/Sistema-Girassol/examples/listagem')
-    await renderApp()
+    await renderAuthedApp({ path: '/examples/listagem', fetchHandler: examplesHandler })
 
     fireEvent.click(
       await screen.findByRole(
@@ -115,15 +93,13 @@ describe('Demonstração autenticada da listagem', () => {
   })
 
   it('abre o detalhe diretamente sem depender do estado da navegação', async () => {
-    window.history.pushState({}, '', '/Sistema-Girassol/examples/listagem/2')
-    await renderApp()
+    await renderAuthedApp({ path: '/examples/listagem/2', fetchHandler: examplesHandler })
 
     expect(await screen.findByText('Registro Beta')).toBeInTheDocument()
   })
 
   it('mostra o estado não encontrado para id inexistente', async () => {
-    window.history.pushState({}, '', '/Sistema-Girassol/examples/listagem/999')
-    await renderApp()
+    await renderAuthedApp({ path: '/examples/listagem/999', fetchHandler: examplesHandler })
 
     expect(
       await screen.findByText('Registro não encontrado'),
@@ -131,9 +107,7 @@ describe('Demonstração autenticada da listagem', () => {
   })
 
   it('protege o exemplo quando não há sessão', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => response({}, 401)))
-    window.history.pushState({}, '', '/Sistema-Girassol/examples/listagem')
-    await renderApp()
+    await renderAuthedApp({ me: null, path: '/examples/listagem' })
 
     expect(
       await screen.findByRole('button', { name: /entrar/i }),
@@ -146,8 +120,7 @@ describe('Demonstração autenticada da listagem', () => {
 
   it('não expõe as rotas de exemplo em produção', async () => {
     vi.stubEnv('DEV', false)
-    window.history.pushState({}, '', '/Sistema-Girassol/examples/listagem')
-    await renderApp()
+    await renderAuthedApp({ path: '/examples/listagem' })
 
     expect(
       await screen.findByText(/Página não encontrada/i),

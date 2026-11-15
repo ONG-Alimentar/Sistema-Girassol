@@ -1,48 +1,25 @@
 import { lazy, Suspense } from 'react'
-import type { ReactNode } from 'react'
 import { LoadingState } from './components/common/LoadingState'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { PermissionGuard } from './auth/PermissionGuard.tsx'
 import { RequireAuth } from './auth/RequireAuth.tsx'
-import type { Permission } from './auth/permissions.ts'
+import { MODULES } from './navigation/modules.ts'
 import { AppLayout } from './layouts/AppLayout.tsx'
 import { DashboardPage } from './pages/DashboardPage.tsx'
 import { ForbiddenPage } from './pages/ForbiddenPage.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
 import { ModulePlaceholder } from './pages/ModulePlaceholder.tsx'
-import { UsuariosPage } from './pages/admin/UsuariosPage'
-import { CargosPage } from './pages/admin/CargosPage'
-import { PermissoesPage } from './pages/admin/PermissoesPage'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 
 // Exemplos carregados apenas em desenvolvimento, sem entrar no menu de produção.
 const ExampleListPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleListPage').then((module) => ({ default: module.ExampleListPage }))) : () => null
 const ExampleDetailPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleDetailPage').then((module) => ({ default: module.ExampleDetailPage }))) : () => null
 
-interface ModuleRoute {
-  path: string
-  title: string
-  permission: Permission
-}
-
-// Telas de administração RBAC (#3): páginas reais (não placeholders), cada uma
-// protegida pela permissão de leitura da sua entidade.
-const ADMIN_ROUTES: { path: string; permission: Permission; element: ReactNode }[] = [
-  { path: 'admin/usuarios', permission: 'USUARIO:READ', element: <UsuariosPage /> },
-  { path: 'admin/cargos', permission: 'CARGO:READ', element: <CargosPage /> },
-  { path: 'admin/permissoes', permission: 'PERMISSAO:READ', element: <PermissoesPage /> },
-]
-
-// Módulos protegidos por permissão. Cada um vira uma rota cujo elemento é
-// envolvido por PermissionGuard (redirect → /403 quando falta a permissão).
-const MODULES: ModuleRoute[] = [
-  { path: 'familias', title: 'Famílias', permission: 'FAMILIA:READ' },
-  { path: 'cestas', title: 'Cestas', permission: 'CESTA:READ' },
-  { path: 'roupas', title: 'Roupas', permission: 'ROUPA:READ' },
-  { path: 'visitas', title: 'Visitas', permission: 'VISITA:READ' },
-  { path: 'juridico', title: 'Jurídico', permission: 'JURIDICO:READ' },
-  { path: 'psicologico', title: 'Psicológico', permission: 'PSICOLOGICO:READ' },
-]
+// Os módulos protegidos vêm do registro único em navigation/modules.ts
+// (compartilhado com o drawer e a home). Cada um vira uma rota cujo elemento é
+// envolvido por PermissionGuard (redirect → /403 quando falta a permissão). O
+// módulo renderiza sua página real (component) ou, se ainda não implementada, o
+// ModulePlaceholder.
 
 /** Árvore de rotas da aplicação. */
 export function AppRoutes() {
@@ -61,28 +38,20 @@ export function AppRoutes() {
         )}
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
-          {MODULES.map((m) => (
-            <Route
-              key={m.path}
-              path={m.path}
-              element={
-                <PermissionGuard permission={m.permission} redirect>
-                  <ModulePlaceholder title={m.title} />
-                </PermissionGuard>
-              }
-            />
-          ))}
-          {ADMIN_ROUTES.map((r) => (
-            <Route
-              key={r.path}
-              path={r.path}
-              element={
-                <PermissionGuard permission={r.permission} redirect>
-                  {r.element}
-                </PermissionGuard>
-              }
-            />
-          ))}
+          {MODULES.map((m) => {
+            const Page = m.component
+            return (
+              <Route
+                key={m.path}
+                path={m.path}
+                element={
+                  <PermissionGuard permission={m.permission} redirect>
+                    {Page ? <Page /> : <ModulePlaceholder title={m.label} />}
+                  </PermissionGuard>
+                }
+              />
+            )
+          })}
           <Route path="403" element={<ForbiddenPage />} />
         </Route>
       </Route>
