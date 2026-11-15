@@ -13,7 +13,10 @@ const VALID_ID = /^[1-9]\d*$/
 export interface DetailField<T> {
   label: string
   field: keyof T
-  /** Formata o valor; por padrão usa String(value) (— quando nulo). */
+  /**
+   * Formata o valor do campo. Sem `render`, usa `String(value)` (— quando nulo),
+   * então os campos devem ser escalares; use `render` para datas/objetos/JSX.
+   */
   render?: (value: T[keyof T], item: T) => ReactNode
 }
 
@@ -30,7 +33,7 @@ interface DetailViewProps<T> {
 
   // Overrides dos estados compartilhados (#27).
   loadingState?: ReactNode
-  /** Usado quando o registro não existe (404). */
+  /** Mostrado apenas no 404 (registro não encontrado), não em outros erros. */
   emptyState?: ReactNode
   errorState?: (error: Error, retry: () => void) => ReactNode
 }
@@ -40,6 +43,10 @@ interface DetailViewProps<T> {
  * por `fields` — espelha o PaginatedList (#23) para a tela de Detalhes (#24).
  * Consome o GET `/{recurso}/{id}` (base da #29) e os estados da #27; o 404 no
  * formato ApiError vira "registro não encontrado".
+ *
+ * loading/item/error são DERIVADOS de uma request key (`endpoint/id#refresh`),
+ * então trocar `id`/`endpoint` com o componente montado reseta na hora (sem
+ * exibir o item anterior nem perder o 404 de um id inválido).
  */
 export function DetailView<T>({
   endpoint,
@@ -52,15 +59,26 @@ export function DetailView<T>({
   errorState,
 }: DetailViewProps<T>) {
   const validId = Boolean(id && VALID_ID.test(id))
+  const requestKey = `${endpoint}/${id}#`
 
-  const [item, setItem] = useState<T | null>(null)
-  const [loading, setLoading] = useState(validId)
-  const [error, setError] = useState<Error | null>(
-    validId ? null : new ApiError('Registro não encontrado.', { status: 404 }),
-  )
+  const [result, setResult] = useState<{
+    key: string
+    item: T | null
+    error: Error | null
+  } | null>(null)
   const [refresh, setRefresh] = useState(0)
 
-  const retry = useCallback(() => setRefresh((current) => current + 1), [])
+  const activeKey = `${requestKey}${refresh}`
+  // current só "resolve" quando o resultado em estado é o da requisição atual;
+  // ao trocar id/endpoint/refresh a chave muda e tudo volta a loading na hora.
+  const current = result?.key === activeKey ? result : null
+  const loading = validId && current === null
+  const item = current?.item ?? null
+  const error = !validId
+    ? new ApiError('Registro não encontrado.', { status: 404 })
+    : (current?.error ?? null)
+
+  const retry = useCallback(() => setRefresh((value) => value + 1), [])
 
   useEffect(() => {
     if (!validId) return
@@ -68,29 +86,25 @@ export function DetailView<T>({
     const controller = new AbortController()
 
     async function load() {
-      setLoading(true)
-      setError(null)
-
       try {
-        const result = await apiFetch<T>(`${endpoint}/${id}`, { signal: controller.signal })
-        if (controller.signal.aborted) return
-        setItem(result)
+        const loaded = await apiFetch<T>(`${endpoint}/${id}`, { signal: controller.signal })
+        if (!controller.signal.aborted) setResult({ key: activeKey, item: loaded, error: null })
       } catch (cause) {
         if (controller.signal.aborted) return
-        setError(
-          cause instanceof Error
+        setResult({
+          key: activeKey,
+          item: null,
+          error: cause instanceof Error
             ? cause
             : new Error('Não foi possível carregar o registro.'),
-        )
-      } finally {
-        if (!controller.signal.aborted) setLoading(false)
+        })
       }
     }
 
     void load()
 
     return () => controller.abort()
-  }, [endpoint, id, validId, refresh])
+  }, [endpoint, id, validId, activeKey])
 
   if (loading) {
     return <>{loadingState ?? <LoadingState message="Carregando registro..." />}</>

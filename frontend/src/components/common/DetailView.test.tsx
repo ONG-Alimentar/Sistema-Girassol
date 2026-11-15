@@ -17,13 +17,14 @@ function response(body: unknown, status = 200) {
   })
 }
 
-function mount(props: Partial<React.ComponentProps<typeof DetailView<Item>>> = {}) {
+function mount(props: { id?: string; onEdit?: (item: Item) => void } = {}) {
+  const { id = '1', onEdit } = props
   return render(
     <DetailView<Item>
       endpoint="/api/examples/listagem"
-      id="1"
+      id={id}
       fields={fields}
-      {...props}
+      onEdit={onEdit}
     />,
   )
 }
@@ -75,6 +76,22 @@ describe('DetailView — tela de Detalhes genérica (#24)', () => {
 
     expect(await screen.findByText('Registro Alfa')).toBeInTheDocument()
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2))
+  })
+
+  it('reseta ao trocar o id (não mostra o item anterior num id inválido)', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response(item)))
+
+    const { rerender } = render(
+      <DetailView<Item> endpoint="/api/examples/listagem" id="1" fields={fields} />,
+    )
+    expect(await screen.findByText('Registro Alfa')).toBeInTheDocument()
+
+    rerender(
+      <DetailView<Item> endpoint="/api/examples/listagem" id="abc" fields={fields} />,
+    )
+
+    expect(await screen.findByText('Registro não encontrado')).toBeInTheDocument()
+    expect(screen.queryByText('Registro Alfa')).not.toBeInTheDocument()
   })
 
   it('aciona onEdit com o item carregado', async () => {
