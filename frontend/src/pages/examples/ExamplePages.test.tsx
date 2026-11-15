@@ -35,6 +35,7 @@ beforeAll(async () => {
   await Promise.all([
     import('./ExampleListPage'),
     import('./ExampleDetailPage'),
+    import('./ExampleEditPage'),
   ])
 }, 60000)
 
@@ -96,6 +97,19 @@ describe('Demonstração autenticada da listagem', () => {
     await renderAuthedApp({ path: '/examples/listagem/2', fetchHandler: examplesHandler })
 
     expect(await screen.findByText('Registro Beta')).toBeInTheDocument()
+  })
+
+  it('navega do detalhe para a edição (Detalhes → Edição)', async () => {
+    await renderAuthedApp({ path: '/examples/listagem/2', fetchHandler: examplesHandler })
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Editar' }))
+
+    expect(
+      await screen.findByRole('heading', { name: 'Edição de exemplo' }),
+    ).toBeInTheDocument()
+    expect(window.location.pathname).toBe(
+      '/Sistema-Girassol/examples/listagem/2/editar',
+    )
   })
 
   it('mostra o estado não encontrado para id inexistente', async () => {

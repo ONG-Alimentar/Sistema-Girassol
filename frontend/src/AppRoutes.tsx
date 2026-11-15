@@ -14,6 +14,7 @@ import { NotFoundPage } from './pages/NotFoundPage.tsx'
 // Exemplos carregados apenas em desenvolvimento, sem entrar no menu de produção.
 const ExampleListPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleListPage').then((module) => ({ default: module.ExampleListPage }))) : () => null
 const ExampleDetailPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleDetailPage').then((module) => ({ default: module.ExampleDetailPage }))) : () => null
+const ExampleEditPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleEditPage').then((module) => ({ default: module.ExampleEditPage }))) : () => null
 
 // Os módulos protegidos vêm do registro único em navigation/modules.ts
 // (compartilhado com o drawer e a home). Cada um vira uma rota cujo elemento é
@@ -34,6 +35,7 @@ export function AppRoutes() {
           <>
             <Route path="examples/listagem" element={<Suspense fallback={<LoadingState />}><ExampleListPage /></Suspense>} />
             <Route path="examples/listagem/:id" element={<Suspense fallback={<LoadingState />}><ExampleDetailPage /></Suspense>} />
+            <Route path="examples/listagem/:id/editar" element={<Suspense fallback={<LoadingState />}><ExampleEditPage /></Suspense>} />
           </>
         )}
         <Route element={<AppLayout />}>
