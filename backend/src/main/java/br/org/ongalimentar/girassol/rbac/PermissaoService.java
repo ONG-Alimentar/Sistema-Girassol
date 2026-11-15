@@ -1,54 +1,40 @@
 package br.org.ongalimentar.girassol.rbac;
 
-import java.util.function.Consumer;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import br.org.ongalimentar.girassol.common.crud.CrudService;
+import br.org.ongalimentar.girassol.common.error.ResourceNotFoundException;
 
 /**
- * CRUD da {@link Permissao} (catálogo RBAC) sobre a base genérica. Os guards
- * {@code PERMISSAO:*} restringem a administração do catálogo ao Administrador —
- * padrão de autorização por método do {@code SecurityConfig}.
+ * Consulta do catálogo de {@link Permissao}. O catálogo é <b>somente-leitura</b>
+ * pela API: ele é acoplado ao código (as permissões são referenciadas por string
+ * nos {@code @PreAuthorize}), então criar/renomear/excluir por fora quebraria a
+ * autorização silenciosamente. A manutenção fica a cargo do seed ({@code DataSeeder}).
+ * Leitura guardada por {@code PERMISSAO:READ}.
  */
 @Service
-public class PermissaoService extends CrudService<Permissao, Long> {
+public class PermissaoService {
+
+	private final PermissaoRepository repository;
 
 	public PermissaoService(PermissaoRepository repository) {
-		super(repository, "Permissão");
+		this.repository = repository;
 	}
 
-	@Override
+	@Transactional(readOnly = true)
 	@PreAuthorize("hasAuthority('PERMISSAO:READ')")
 	public Page<Permissao> list(Specification<Permissao> filtro, Pageable pageable) {
-		return super.list(filtro, pageable);
+		return repository.findAll(filtro, pageable);
 	}
 
-	@Override
+	@Transactional(readOnly = true)
 	@PreAuthorize("hasAuthority('PERMISSAO:READ')")
 	public Permissao buscar(Long id) {
-		return super.buscar(id);
-	}
-
-	@Override
-	@PreAuthorize("hasAuthority('PERMISSAO:CREATE')")
-	public Permissao criar(Permissao entidade) {
-		return super.criar(entidade);
-	}
-
-	@Override
-	@PreAuthorize("hasAuthority('PERMISSAO:UPDATE')")
-	public Permissao atualizar(Long id, Consumer<Permissao> patch) {
-		return super.atualizar(id, patch);
-	}
-
-	@Override
-	@PreAuthorize("hasAuthority('PERMISSAO:DELETE')")
-	public void excluir(Long id) {
-		super.excluir(id);
+		return repository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Permissão não encontrada: " + id));
 	}
 }

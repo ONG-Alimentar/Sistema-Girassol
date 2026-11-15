@@ -2,23 +2,26 @@ package br.org.ongalimentar.girassol.rbac;
 
 import java.util.Map;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.org.ongalimentar.girassol.common.crud.CrudController;
-import br.org.ongalimentar.girassol.common.crud.CrudService;
-import br.org.ongalimentar.girassol.rbac.dto.PermissaoRequest;
+import br.org.ongalimentar.girassol.common.crud.PaginatedList;
 import br.org.ongalimentar.girassol.rbac.dto.PermissaoResponse;
 
 /**
- * CRUD REST do catálogo de {@link Permissao} sobre a base genérica
- * ({@link CrudController}). O específico é o mapeamento DTO↔entidade e o filtro
- * {@code ?q=} por código. Autorização RBAC fica no {@link PermissaoService}.
+ * API <b>somente-leitura</b> do catálogo de {@link Permissao} (administração, #3):
+ * {@code GET /} (paginado/ordenado/filtrado por {@code ?q=}) e {@code GET /{id}}.
+ * Não há escrita por design — ver {@link PermissaoService}. Autorização RBAC
+ * ({@code PERMISSAO:READ}) fica no service.
  */
 @RestController
 @RequestMapping("/api/permissoes")
-public class PermissaoController extends CrudController<Permissao, Long, PermissaoRequest, PermissaoResponse> {
+public class PermissaoController {
 
 	private final PermissaoService service;
 
@@ -26,29 +29,20 @@ public class PermissaoController extends CrudController<Permissao, Long, Permiss
 		this.service = service;
 	}
 
-	@Override
-	protected CrudService<Permissao, Long> service() {
-		return service;
+	@GetMapping
+	public PaginatedList<PermissaoResponse> listar(@RequestParam(required = false) Map<String, String> params,
+			Pageable pageable) {
+		return PaginatedList.from(service.list(filtro(params == null ? Map.of() : params), pageable),
+				PermissaoResponse::from);
 	}
 
-	@Override
-	protected Permissao toEntity(PermissaoRequest req) {
-		return new Permissao(req.codigo());
-	}
-
-	@Override
-	protected void apply(PermissaoRequest req, Permissao p) {
-		p.setCodigo(req.codigo());
-	}
-
-	@Override
-	protected PermissaoResponse toResponse(Permissao p) {
-		return PermissaoResponse.from(p);
+	@GetMapping("/{id}")
+	public PermissaoResponse buscar(@PathVariable Long id) {
+		return PermissaoResponse.from(service.buscar(id));
 	}
 
 	/** Filtro opcional {@code ?q=}: busca por código (case-insensitive). */
-	@Override
-	protected Specification<Permissao> filtro(Map<String, String> params) {
+	private Specification<Permissao> filtro(Map<String, String> params) {
 		String q = params.get("q");
 		if (q == null || q.isBlank()) {
 			return null;

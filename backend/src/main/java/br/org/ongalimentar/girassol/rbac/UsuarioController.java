@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.org.ongalimentar.girassol.common.crud.CrudController;
 import br.org.ongalimentar.girassol.common.crud.CrudService;
+import br.org.ongalimentar.girassol.common.error.FieldValidationException;
 import br.org.ongalimentar.girassol.rbac.dto.UsuarioAdminRequest;
 import br.org.ongalimentar.girassol.rbac.dto.UsuarioAdminResponse;
 
@@ -24,6 +25,9 @@ import br.org.ongalimentar.girassol.rbac.dto.UsuarioAdminResponse;
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController extends CrudController<Usuario, Long, UsuarioAdminRequest, UsuarioAdminResponse> {
+
+	/** Tamanho mínimo da senha ao defini-la (criação ou troca). */
+	static final int SENHA_MIN = 8;
 
 	private final UsuarioService service;
 	private final CargoRepository cargoRepository;
@@ -43,9 +47,9 @@ public class UsuarioController extends CrudController<Usuario, Long, UsuarioAdmi
 	@Override
 	protected Usuario toEntity(UsuarioAdminRequest req) {
 		if (req.senha() == null || req.senha().isBlank()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A senha é obrigatória ao criar um usuário.");
+			throw new FieldValidationException("senha", "A senha é obrigatória ao criar um usuário.");
 		}
-		Usuario usuario = new Usuario(req.nome(), req.email(), passwordEncoder.encode(req.senha()));
+		Usuario usuario = new Usuario(req.nome(), req.email(), encodeSenha(req.senha()));
 		usuario.setAtivo(req.ativo() == null || req.ativo());
 		sincronizarCargos(req.cargoIds(), usuario);
 		return usuario;
@@ -60,9 +64,17 @@ public class UsuarioController extends CrudController<Usuario, Long, UsuarioAdmi
 		}
 		// Senha só é alterada quando informada — ausente/vazia mantém a atual.
 		if (req.senha() != null && !req.senha().isBlank()) {
-			usuario.setSenhaHash(passwordEncoder.encode(req.senha()));
+			usuario.setSenhaHash(encodeSenha(req.senha()));
 		}
 		sincronizarCargos(req.cargoIds(), usuario);
+	}
+
+	/** Valida o tamanho mínimo (como erro de campo) e devolve o hash BCrypt. */
+	private String encodeSenha(String senha) {
+		if (senha.trim().length() < SENHA_MIN) {
+			throw new FieldValidationException("senha", "A senha deve ter ao menos " + SENHA_MIN + " caracteres.");
+		}
+		return passwordEncoder.encode(senha);
 	}
 
 	@Override

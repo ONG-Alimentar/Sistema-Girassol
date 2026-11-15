@@ -56,13 +56,15 @@ PSICOLOGICO:READ|CREATE|UPDATE|DELETE
 
 USUARIO:READ|CREATE|UPDATE|DELETE     (Administrador)
 CARGO:READ|CREATE|UPDATE|DELETE       (Administrador)
-PERMISSAO:READ|CREATE|UPDATE|DELETE   (Administrador)
+PERMISSAO:READ                        (Administrador)
 ```
 
-> **Administração RBAC (#3):** as permissões `USUARIO:*`, `CARGO:*` e `PERMISSAO:*`
-> protegem o CRUD das próprias entidades de controle de acesso (telas de
-> administração). São concedidas **somente ao Administrador** — nenhum outro cargo
-> gere usuários, cargos ou o catálogo de permissões.
+> **Administração RBAC (#3):** as permissões `USUARIO:*` e `CARGO:*` protegem o CRUD
+> dos usuários e cargos (telas de administração), concedidas **somente ao
+> Administrador**. O **catálogo de permissões** é **somente-leitura** pela API
+> (`PERMISSAO:READ`): como os códigos são referenciados no código-fonte
+> (`@PreAuthorize`), criar/renomear/excluir por fora quebraria a autorização
+> silenciosamente — a manutenção do catálogo fica a cargo do seed (`DataSeeder`).
 
 Mapeamento cargo → permissões:
 

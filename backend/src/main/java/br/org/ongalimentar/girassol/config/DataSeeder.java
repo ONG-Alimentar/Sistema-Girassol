@@ -50,9 +50,11 @@ public class DataSeeder implements CommandLineRunner {
 			"JURIDICO:READ", "JURIDICO:CREATE", "JURIDICO:UPDATE", "JURIDICO:DELETE",
 			"PSICOLOGICO:READ", "PSICOLOGICO:CREATE", "PSICOLOGICO:UPDATE", "PSICOLOGICO:DELETE",
 			// Administração RBAC (#3) — concedidas apenas ao ADMINISTRADOR.
+			// O catálogo de permissões é somente-leitura pela API (acoplado ao código),
+			// por isso só há PERMISSAO:READ.
 			"USUARIO:READ", "USUARIO:CREATE", "USUARIO:UPDATE", "USUARIO:DELETE",
 			"CARGO:READ", "CARGO:CREATE", "CARGO:UPDATE", "CARGO:DELETE",
-			"PERMISSAO:READ", "PERMISSAO:CREATE", "PERMISSAO:UPDATE", "PERMISSAO:DELETE");
+			"PERMISSAO:READ");
 
 	/** Mapeamento cargo → permissões (rbac.md). ADMINISTRADOR recebe tudo. */
 	private static final Map<String, List<String>> CARGOS = cargos();

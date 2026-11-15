@@ -23,4 +23,16 @@ public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
 			where u.email = :email
 			""")
 	Optional<Usuario> findByEmailComAutoridades(@Param("email") String email);
+
+	/**
+	 * Conta usuários <b>ativos</b> cujo conjunto de cargos concede a permissão
+	 * {@code codigo}. Usado para garantir que sempre reste um administrador capaz
+	 * de gerir o RBAC (ver {@code UsuarioService}).
+	 */
+	@Query("""
+			select count(distinct u) from Usuario u
+			join u.cargos c join c.permissoes p
+			where u.ativo = true and p.codigo = :codigo
+			""")
+	long countAtivosComPermissao(@Param("codigo") String codigo);
 }

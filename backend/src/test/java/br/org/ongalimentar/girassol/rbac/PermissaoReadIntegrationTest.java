@@ -23,14 +23,14 @@ import org.springframework.web.context.WebApplicationContext;
 import br.org.ongalimentar.girassol.TestcontainersConfiguration;
 
 /**
- * Valida o CRUD de {@code /api/permissoes} (administração RBAC, #3): ciclo
- * completo, filtro por código, validação do formato {@code MODULO:ACAO} (400) e a
- * barreira RBAC (403). Postgres real (Testcontainers) + MockMvc autenticado.
+ * Valida a API somente-leitura de {@code /api/permissoes} (administração RBAC, #3):
+ * listagem paginada, busca por código, detalhe, 404, a barreira RBAC (403) e que a
+ * escrita não é exposta (sem endpoints POST/PUT/DELETE).
  */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
-@WithMockUser(authorities = { "PERMISSAO:READ", "PERMISSAO:CREATE", "PERMISSAO:UPDATE", "PERMISSAO:DELETE" })
-class PermissaoCrudIntegrationTest {
+@WithMockUser(authorities = "PERMISSAO:READ")
+class PermissaoReadIntegrationTest {
 
 	@Autowired
 	private WebApplicationContext context;
@@ -42,57 +42,31 @@ class PermissaoCrudIntegrationTest {
 	@BeforeEach
 	void setup() {
 		repository.deleteAll();
+		repository.save(new Permissao("RELATORIO:READ"));
+		repository.save(new Permissao("AUDITORIA:READ"));
 		mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 	}
 
 	@Test
-	void criaBuscaListaAtualizaEExclui() throws Exception {
-		mvc.perform(post("/api/permissoes").contentType(MediaType.APPLICATION_JSON)
-				.content("{\"codigo\":\"RELATORIO:READ\"}"))
-				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id").isNumber())
-				.andExpect(jsonPath("$.codigo").value("RELATORIO:READ"));
-
-		Long id = repository.findByCodigo("RELATORIO:READ").orElseThrow().getId();
-
-		mvc.perform(get("/api/permissoes/" + id))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.codigo").value("RELATORIO:READ"));
-
+	void listaNoFormatoPaginado() throws Exception {
 		mvc.perform(get("/api/permissoes"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.content[0].codigo").value("RELATORIO:READ"))
-				.andExpect(jsonPath("$.totalElements").value(1));
-
-		mvc.perform(put("/api/permissoes/" + id).contentType(MediaType.APPLICATION_JSON)
-				.content("{\"codigo\":\"RELATORIO:CREATE\"}"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.codigo").value("RELATORIO:CREATE"));
-
-		mvc.perform(delete("/api/permissoes/" + id)).andExpect(status().isNoContent());
-		mvc.perform(get("/api/permissoes/" + id)).andExpect(status().isNotFound());
+				.andExpect(jsonPath("$.totalElements").value(2))
+				.andExpect(jsonPath("$.page").value(0));
 	}
 
 	@Test
-	void filtraPorCodigo() throws Exception {
-		mvc.perform(post("/api/permissoes").contentType(MediaType.APPLICATION_JSON)
-				.content("{\"codigo\":\"RELATORIO:READ\"}")).andExpect(status().isCreated());
-		mvc.perform(post("/api/permissoes").contentType(MediaType.APPLICATION_JSON)
-				.content("{\"codigo\":\"AUDITORIA:READ\"}")).andExpect(status().isCreated());
+	void filtraPorCodigoEBuscaPorId() throws Exception {
+		Long id = repository.findByCodigo("RELATORIO:READ").orElseThrow().getId();
 
 		mvc.perform(get("/api/permissoes").param("q", "relatorio"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.totalElements").value(1))
 				.andExpect(jsonPath("$.content[0].codigo").value("RELATORIO:READ"));
-	}
 
-	@Test
-	void codigoEmFormatoInvalidoRetorna400() throws Exception {
-		mvc.perform(post("/api/permissoes").contentType(MediaType.APPLICATION_JSON)
-				.content("{\"codigo\":\"formato errado\"}"))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.status").value(400))
-				.andExpect(jsonPath("$.fieldErrors[?(@.field=='codigo')]").exists());
+		mvc.perform(get("/api/permissoes/" + id))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.codigo").value("RELATORIO:READ"));
 	}
 
 	@Test
@@ -104,10 +78,28 @@ class PermissaoCrudIntegrationTest {
 	}
 
 	@Test
-	@WithMockUser(authorities = "PERMISSAO:READ")
-	void semPermissaoDeCriarRetorna403() throws Exception {
+	void escritaNaoPersisteNoCatalogo() throws Exception {
+		// Não há endpoints de escrita; o importante é o invariante: nada é
+		// criado, renomeado ou removido pela API (o catálogo é mantido pelo seed).
+		long antes = repository.count();
+		Long id = repository.findByCodigo("RELATORIO:READ").orElseThrow().getId();
+
 		mvc.perform(post("/api/permissoes").contentType(MediaType.APPLICATION_JSON)
-				.content("{\"codigo\":\"RELATORIO:READ\"}"))
+				.content("{\"codigo\":\"RELATORIO:CREATE\"}"));
+		mvc.perform(put("/api/permissoes/" + id).contentType(MediaType.APPLICATION_JSON)
+				.content("{\"codigo\":\"RELATORIO:LER\"}"));
+		mvc.perform(delete("/api/permissoes/" + id));
+
+		org.junit.jupiter.api.Assertions.assertEquals(antes, repository.count(),
+				"Nenhuma permissão deve ser criada ou removida pela API.");
+		org.junit.jupiter.api.Assertions.assertTrue(repository.findByCodigo("RELATORIO:READ").isPresent(),
+				"O código de uma permissão não deve ser alterável pela API.");
+	}
+
+	@Test
+	@WithMockUser(authorities = "CARGO:READ")
+	void semPermissaoDeLerRetorna403() throws Exception {
+		mvc.perform(get("/api/permissoes"))
 				.andExpect(status().isForbidden());
 	}
 }
