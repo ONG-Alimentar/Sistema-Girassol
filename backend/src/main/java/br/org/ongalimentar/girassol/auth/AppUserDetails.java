@@ -1,14 +1,15 @@
 package br.org.ongalimentar.girassol.auth;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * Principal autenticado. Carrega os dados que a API expõe (id, email, nome) e as
- * autoridades (permissões {@code MODULO:ACAO}) já materializadas, para não depender
- * de sessão JPA aberta após o login.
+ * Principal autenticado. Carrega os dados que a API expõe (id, email, nome, cargos)
+ * e as autoridades (permissões {@code MODULO:ACAO}) já materializadas, para não
+ * depender de sessão JPA aberta após o login.
  */
 public class AppUserDetails implements UserDetails {
 
@@ -18,19 +19,26 @@ public class AppUserDetails implements UserDetails {
 	private final String senhaHash;
 	private final boolean ativo;
 	private final Collection<? extends GrantedAuthority> authorities;
+	private final List<String> cargos;
 
 	public AppUserDetails(Long id, String email, String nome, String senhaHash,
-			boolean ativo, Collection<? extends GrantedAuthority> authorities) {
+			boolean ativo, Collection<? extends GrantedAuthority> authorities, List<String> cargos) {
 		this.id = id;
 		this.email = email;
 		this.nome = nome;
 		this.senhaHash = senhaHash;
 		this.ativo = ativo;
 		this.authorities = authorities;
+		this.cargos = cargos;
 	}
 
 	public Long getId() {
 		return id;
+	}
+
+	/** Nomes dos cargos do usuário (ex.: {@code ADMINISTRADOR}). */
+	public List<String> getCargos() {
+		return cargos;
 	}
 
 	public String getEmail() {

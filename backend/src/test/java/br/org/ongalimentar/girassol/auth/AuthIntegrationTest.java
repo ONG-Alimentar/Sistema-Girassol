@@ -72,6 +72,7 @@ class AuthIntegrationTest {
 				.andExpect(jsonPath("$.email").value("fulana@ong.org"))
 				.andExpect(jsonPath("$.nome").value("Fulana"))
 				.andExpect(jsonPath("$.permissions[0]").value("FAMILIA:READ"))
+				.andExpect(jsonPath("$.cargos[0]").value("ASSISTENTE_SOCIAL"))
 				.andReturn();
 
 		MockHttpSession session = (MockHttpSession) login.getRequest().getSession(false);

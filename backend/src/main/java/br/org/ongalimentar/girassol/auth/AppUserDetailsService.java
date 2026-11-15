@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.org.ongalimentar.girassol.rbac.Cargo;
 import br.org.ongalimentar.girassol.rbac.Permissao;
 import br.org.ongalimentar.girassol.rbac.Usuario;
 import br.org.ongalimentar.girassol.rbac.UsuarioRepository;
@@ -39,12 +40,18 @@ public class AppUserDetailsService implements UserDetailsService {
 				.map(SimpleGrantedAuthority::new)
 				.toList();
 
+		var cargos = usuario.getCargos().stream()
+				.map(Cargo::getNome)
+				.sorted()
+				.toList();
+
 		return new AppUserDetails(
 				usuario.getId(),
 				usuario.getEmail(),
 				usuario.getNome(),
 				usuario.getSenhaHash(),
 				usuario.isAtivo(),
-				authorities);
+				authorities,
+				cargos);
 	}
 }
