@@ -50,6 +50,7 @@ export function DashboardPage() {
                 <Icon sx={{ fontSize: 40, color: 'primary.main' }} />
                 <Typography
                   variant="subtitle1"
+                  component="h2"
                   sx={{ fontWeight: 700, textAlign: 'center' }}
                 >
                   {m.label}

@@ -1,30 +1,6 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { App } from '../App'
-import type { Permission } from '../auth/permissions.ts'
-
-const response = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  })
-
-async function renderShellWith(permissions: Permission[]) {
-  vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-    if (url.endsWith('/api/auth/me')) {
-      return response({ id: 1, email: 'teste@example.org', permissions })
-    }
-    return response({}, 404)
-  }))
-  window.history.pushState({}, '', '/Sistema-Girassol/')
-  await act(async () => {
-    render(<App />)
-  })
-}
-
-beforeEach(() => {
-  vi.stubEnv('BASE_URL', '/Sistema-Girassol/')
-})
+import { cleanup, fireEvent, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { renderAuthedApp } from '../test/appRender.tsx'
 
 afterEach(() => {
   cleanup()
@@ -34,14 +10,14 @@ afterEach(() => {
 
 describe('AppLayout — chrome mobile', () => {
   it('mostra a bottom tab bar (Início / Famílias / Mais)', async () => {
-    await renderShellWith(['FAMILIA:READ'])
+    await renderAuthedApp({ me: { permissions: ['FAMILIA:READ'] } })
 
     expect(await screen.findByRole('button', { name: 'Início' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Mais' })).toBeInTheDocument()
   })
 
   it('a aba Famílias da bottom bar respeita a permissão (Voluntário não a vê)', async () => {
-    await renderShellWith(['CESTA:READ', 'ROUPA:READ', 'VISITA:READ'])
+    await renderAuthedApp({ me: { permissions: ['CESTA:READ', 'ROUPA:READ', 'VISITA:READ'] } })
 
     // Início e Mais continuam; Famílias (exige FAMILIA:READ) some.
     expect(await screen.findByRole('button', { name: 'Início' })).toBeInTheDocument()
@@ -50,7 +26,7 @@ describe('AppLayout — chrome mobile', () => {
   })
 
   it('o hambúrguer abre o drawer com os módulos permitidos (Admin vê Usuários)', async () => {
-    await renderShellWith(['CONTA:CREATE', 'FAMILIA:READ'])
+    await renderAuthedApp({ me: { permissions: ['CONTA:CREATE', 'FAMILIA:READ'] } })
 
     fireEvent.click(await screen.findByRole('button', { name: 'Abrir menu' }))
 
@@ -59,7 +35,7 @@ describe('AppLayout — chrome mobile', () => {
   })
 
   it('o drawer oculta módulos sem permissão (Voluntário não vê Usuários)', async () => {
-    await renderShellWith(['CESTA:READ', 'ROUPA:READ', 'VISITA:READ'])
+    await renderAuthedApp({ me: { permissions: ['CESTA:READ', 'ROUPA:READ', 'VISITA:READ'] } })
 
     fireEvent.click(await screen.findByRole('button', { name: 'Abrir menu' }))
 
@@ -69,7 +45,7 @@ describe('AppLayout — chrome mobile', () => {
   })
 
   it('"Mais" também abre o drawer', async () => {
-    await renderShellWith(['FAMILIA:READ'])
+    await renderAuthedApp({ me: { permissions: ['FAMILIA:READ'] } })
 
     fireEvent.click(await screen.findByRole('button', { name: 'Mais' }))
 
