@@ -12,6 +12,7 @@ import ManageAccounts from '@mui/icons-material/ManageAccounts'
 import Badge from '@mui/icons-material/Badge'
 import Key from '@mui/icons-material/Key'
 import type { Permission } from '../auth/permissions.ts'
+import { FamiliasPage } from '../pages/familias/FamiliasPage'
 import { UsuariosPage } from '../pages/admin/UsuariosPage'
 import { CargosPage } from '../pages/admin/CargosPage'
 import { PermissoesPage } from '../pages/admin/PermissoesPage'
@@ -43,7 +44,7 @@ export interface ModuleDef {
  * deste menu.
  */
 export const MODULES: ModuleDef[] = [
-  { path: 'familias', label: 'Famílias', permission: 'FAMILIA:READ', icon: Groups },
+  { path: 'familias', label: 'Famílias', permission: 'FAMILIA:READ', icon: Groups, component: FamiliasPage },
   { path: 'cestas', label: 'Cestas básicas', permission: 'CESTA:READ', icon: ShoppingBasket },
   { path: 'roupas', label: 'Doação de roupas', permission: 'ROUPA:READ', icon: Checkroom },
   { path: 'visitas', label: 'Registro de visitas', permission: 'VISITA:READ', icon: EventNote },
