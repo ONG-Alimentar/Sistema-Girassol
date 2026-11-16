@@ -1,13 +1,15 @@
 import { Avatar, Box, Stack, Typography } from '@mui/material'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutlineOutlined'
 import SearchIcon from '@mui/icons-material/Search'
+import { useNavigate } from 'react-router-dom'
 import type { FamiliaListItem } from '../../api/familias'
 import { EmptyState } from '../../components/common/EmptyState'
 import { PaginatedList, type ListColumn, type ListFilter } from '../../components/common/PaginatedList'
 
+/** dd/mm/aaaa a partir de uma data ISO (yyyy-mm-dd, com ou sem hora). */
 function formatDate(value: string | null): string {
   if (!value) return 'Não informada'
-  const parts = value.split('-')
+  const parts = value.slice(0, 10).split('-')
   return parts.length === 3 ? parts.reverse().join('/') : 'Não informada'
 }
 
@@ -23,12 +25,9 @@ const filters: ListFilter[] = [{
   startAdornment: <SearchIcon aria-hidden="true" />,
 }]
 
-interface FamiliasPageProps {
-  /** Conectar à rota definitiva do detalhe-hub quando a #50 estiver disponível. */
-  onOpenFamilia?: (familia: FamiliaListItem) => void
-}
+export function FamiliasPage() {
+  const navigate = useNavigate()
 
-export function FamiliasPage({ onOpenFamilia }: FamiliasPageProps) {
   return (
     <Stack spacing={3} sx={{ width: '100%', maxWidth: 900, mx: 'auto', minWidth: 0 }}>
       <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
@@ -40,7 +39,7 @@ export function FamiliasPage({ onOpenFamilia }: FamiliasPageProps) {
         filters={filters}
         mode="cards"
         getItemKey={(familia) => familia.id}
-        onItemClick={onOpenFamilia}
+        onItemClick={(familia) => navigate(`/familias/${familia.id}`)}
         emptyState={
           <EmptyState
             title="Nenhuma família encontrada"

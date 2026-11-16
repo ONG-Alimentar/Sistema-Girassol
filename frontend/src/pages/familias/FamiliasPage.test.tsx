@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { App } from '../../App'
 import { FamiliasPage } from './FamiliasPage'
 
@@ -68,18 +69,25 @@ describe('Listagem real de famílias', () => {
     vi.stubGlobal('fetch', vi.fn()
       .mockResolvedValueOnce(json({ message: 'Falha de consulta' }, 500))
       .mockResolvedValueOnce(json({ ...page([]), totalElements: 0, totalPages: 0 })))
-    render(<FamiliasPage />)
+    render(<MemoryRouter><FamiliasPage /></MemoryRouter>)
     expect(await screen.findByText('Falha de consulta')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
     expect(await screen.findByText('Nenhuma família encontrada')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Buscar por nome' })).toBeEnabled()
   })
 
-  it('entrega a família ao callback preparado para integração com o detalhe', async () => {
+  it('navega para o detalhe-hub (/familias/:id) ao clicar no card', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(page())))
-    const onOpenFamilia = vi.fn()
-    render(<FamiliasPage onOpenFamilia={onOpenFamilia} />)
+    const DetalheStub = () => <span>detalhe-{useParams().id}</span>
+    render(
+      <MemoryRouter initialEntries={['/familias']}>
+        <Routes>
+          <Route path="/familias" element={<FamiliasPage />} />
+          <Route path="/familias/:id" element={<DetalheStub />} />
+        </Routes>
+      </MemoryRouter>,
+    )
     fireEvent.click(await screen.findByRole('button', { name: /Família de teste/ }))
-    expect(onOpenFamilia).toHaveBeenCalledWith(familia)
+    expect(await screen.findByText(`detalhe-${familia.id}`)).toBeInTheDocument()
   })
 })
