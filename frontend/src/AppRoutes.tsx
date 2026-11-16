@@ -15,6 +15,8 @@ import { UsuarioDetailPage } from './pages/admin/UsuarioDetailPage'
 import { CargoDetailPage } from './pages/admin/CargoDetailPage'
 import { PermissaoDetailPage } from './pages/admin/PermissaoDetailPage'
 import { FamiliaDetailPage } from './pages/familias/FamiliaDetailPage.tsx'
+import { CestaDetailPage } from './pages/cestas/CestaDetailPage'
+import { CestaFormPage } from './pages/cestas/CestaFormPage'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { FamiliaFormPage } from './pages/FamiliaFormPage';
 
@@ -67,6 +69,32 @@ export function AppRoutes() {
             element={
               <PermissionGuard permission="FAMILIA:READ" redirect>
                 <FamiliaDetailPage />
+              </PermissionGuard>
+            }
+          />
+          {/* Doações de cesta (#6): criação, edição e detalhe. A listagem
+              /cestas vem do registro de MÓDULOS abaixo (component). */}
+          <Route
+            path="cestas/novo"
+            element={
+              <PermissionGuard permission="CESTA:CREATE" redirect>
+                <CestaFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="cestas/:id/editar"
+            element={
+              <PermissionGuard permission="CESTA:UPDATE" redirect>
+                <CestaFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="cestas/:id"
+            element={
+              <PermissionGuard permission="CESTA:READ" redirect>
+                <CestaDetailPage />
               </PermissionGuard>
             }
           />
