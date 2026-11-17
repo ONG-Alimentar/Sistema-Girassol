@@ -140,12 +140,12 @@ describe('FamiliaDetailPage — detalhe-hub (#50)', () => {
     )
   })
 
-  it('Editar mostra o toast de pendência (#51)', async () => {
+  it('Editar navega para o formulário de edição da família (#51)', async () => {
     await open(['FAMILIA:READ', 'FAMILIA:UPDATE'])
 
     fireEvent.click(await screen.findByRole('button', { name: 'Editar' }))
 
-    expect(await screen.findByText(/edição de famílias chega no #51/i)).toBeInTheDocument()
+    await waitFor(() => expect(window.location.pathname).toBe('/Sistema-Girassol/familias/7/editar'))
   })
 
   it('exibe Telefone e Endereço no card Dados pessoais', async () => {

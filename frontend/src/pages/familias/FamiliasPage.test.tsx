@@ -1,8 +1,21 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { App } from '../../App'
+import { AuthContext } from '../../auth/auth-context.ts'
 import { FamiliasPage } from './FamiliasPage'
+
+/** Stub de auth sem rede, para testes que não exercitam permissões (useAuth só decide o botão "Nova família"). */
+function AuthStub({ children }: { children: ReactNode }) {
+  return (
+    <AuthContext.Provider
+      value={{ user: null, loading: false, login: async () => {}, logout: async () => {}, can: () => false }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
+}
 
 const familia = { id: 12, nome: 'Família de teste', dataCadastro: '2026-11-12' }
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
@@ -69,7 +82,7 @@ describe('Listagem real de famílias', () => {
     vi.stubGlobal('fetch', vi.fn()
       .mockResolvedValueOnce(json({ message: 'Falha de consulta' }, 500))
       .mockResolvedValueOnce(json({ ...page([]), totalElements: 0, totalPages: 0 })))
-    render(<MemoryRouter><FamiliasPage /></MemoryRouter>)
+    render(<AuthStub><MemoryRouter><FamiliasPage /></MemoryRouter></AuthStub>)
     expect(await screen.findByText('Falha de consulta')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /tentar novamente/i }))
     expect(await screen.findByText('Nenhuma família encontrada')).toBeInTheDocument()
@@ -80,12 +93,14 @@ describe('Listagem real de famílias', () => {
     vi.stubGlobal('fetch', vi.fn(async () => json(page())))
     const DetalheStub = () => <span>detalhe-{useParams().id}</span>
     render(
-      <MemoryRouter initialEntries={['/familias']}>
-        <Routes>
-          <Route path="/familias" element={<FamiliasPage />} />
-          <Route path="/familias/:id" element={<DetalheStub />} />
-        </Routes>
-      </MemoryRouter>,
+      <AuthStub>
+        <MemoryRouter initialEntries={['/familias']}>
+          <Routes>
+            <Route path="/familias" element={<FamiliasPage />} />
+            <Route path="/familias/:id" element={<DetalheStub />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthStub>,
     )
     fireEvent.click(await screen.findByRole('button', { name: /Família de teste/ }))
     expect(await screen.findByText(`detalhe-${familia.id}`)).toBeInTheDocument()

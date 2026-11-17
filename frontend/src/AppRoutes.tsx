@@ -41,19 +41,6 @@ const ADMIN_DETAIL_ROUTES: { path: string; permission: Permission; element: Reac
 export function AppRoutes() {
   return (
     <Routes>
-
-      // tirar depois
-
-      {import.meta.env.DEV && (
-      <Route
-        path="/teste-familia"
-        element={
-          <FamiliaFormPage />
-        }
-      />
-    )}
-    // tirar depois
-
       {/* Pública */}
       <Route path="/login" element={<LoginPage />} />
 
@@ -70,6 +57,22 @@ export function AppRoutes() {
           <Route index element={<DashboardPage />} />
           {/* Detalhe-hub da família (#50). O /familias (listagem, #49) vem do
               registro de MÓDULOS abaixo (placeholder até a PR da listagem). */}
+          <Route
+            path="familias/nova"
+            element={
+              <PermissionGuard permission="FAMILIA:CREATE" redirect>
+                <FamiliaFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="familias/:id/editar"
+            element={
+              <PermissionGuard permission="FAMILIA:UPDATE" redirect>
+                <FamiliaFormPage />
+              </PermissionGuard>
+            }
+          />
           <Route
             path="familias/:id"
             element={
@@ -103,26 +106,6 @@ export function AppRoutes() {
               }
             />
           ))}
-          /*
-          <Route
-            path="familias/nova"
-            element={
-              <PermissionGuard permission="FAMILIA:CREATE" redirect>
-                <FamiliaFormPage />
-              </PermissionGuard>
-            }
-          />
-
-          <Route
-            path="familias/:id/editar"
-            element={
-              <PermissionGuard permission="FAMILIA:UPDATE" redirect>
-                <FamiliaFormPage />
-              </PermissionGuard>
-            }
-          />  
-          */
-          
           <Route path="403" element={<ForbiddenPage />} />
 
         </Route>

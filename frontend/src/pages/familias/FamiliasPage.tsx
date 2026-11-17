@@ -1,8 +1,10 @@
-import { Avatar, Box, Stack, Typography } from '@mui/material'
+import { Avatar, Box, Button, Stack, Typography } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutlineOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 import { useNavigate } from 'react-router-dom'
 import type { FamiliaListItem } from '../../api/familias'
+import { useAuth } from '../../auth/useAuth'
 import { EmptyState } from '../../components/common/EmptyState'
 import { PaginatedList, type ListColumn, type ListFilter } from '../../components/common/PaginatedList'
 
@@ -27,12 +29,24 @@ const filters: ListFilter[] = [{
 
 export function FamiliasPage() {
   const navigate = useNavigate()
+  const { can } = useAuth()
 
   return (
     <Stack spacing={3} sx={{ width: '100%', maxWidth: 900, mx: 'auto', minWidth: 0 }}>
-      <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
-        Famílias atendidas
-      </Typography>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
+          Famílias atendidas
+        </Typography>
+        {can('FAMILIA:CREATE') && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/familias/nova')}
+          >
+            Nova família
+          </Button>
+        )}
+      </Stack>
       <PaginatedList<FamiliaListItem>
         endpoint="/api/familias"
         columns={columns}

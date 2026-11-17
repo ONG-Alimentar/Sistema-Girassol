@@ -368,7 +368,7 @@ export function FamiliaDetailPage() {
                     <Button
                       variant="text"
                       startIcon={<EditOutlinedIcon />}
-                      onClick={() => showToast('A edição de famílias chega no #51.', 'info')}
+                      onClick={() => navigate(`/familias/${familia.id}/editar`)}
                       sx={{ fontWeight: 700 }}
                     >
                       Editar
