@@ -98,6 +98,32 @@ class FamiliaResponseTest {
 	}
 
 	@Test
+	void paraListagemIgnoraAsColecoesMesmoQuandoPreenchidas() {
+		Familia familia = new Familia();
+		familia.setNome("Ana da Silva");
+		familia.addTelefone(new Telefone("53999990000"));
+		familia.addServico(novoServico("Cesta básica"));
+
+		FamiliaResponse response = FamiliaResponse.paraListagem(familia);
+
+		assertEquals("Ana da Silva", response.nome());
+		assertTrue(response.telefones().isEmpty());
+		assertTrue(response.enderecos().isEmpty());
+		assertTrue(response.dependentes().isEmpty());
+		assertNull(response.situacaoSocioeconomica());
+		assertTrue(response.problemasSaude().isEmpty());
+		assertTrue(response.medicamentos().isEmpty());
+		assertTrue(response.substancias().isEmpty());
+		assertTrue(response.servicos().isEmpty());
+	}
+
+	private static Servico novoServico(String nome) {
+		Servico servico = new Servico();
+		servico.setNome(nome);
+		return servico;
+	}
+
+	@Test
 	void situacaoSocioeconomicaComCamposOpcionaisNulosNaoQuebra() {
 		Familia familia = new Familia();
 		familia.setNome("Família com situação parcial");

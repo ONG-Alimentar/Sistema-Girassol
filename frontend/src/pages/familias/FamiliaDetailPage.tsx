@@ -22,7 +22,7 @@ interface EnderecoDTO {
 }
 
 interface DependenteDTO {
-  nome: string
+  nome: string | null
   dataNascimento: string | null
   parentesco: string | null
   ocupacao: string | null
@@ -38,12 +38,12 @@ interface SituacaoSocioeconomicaDTO {
 }
 
 interface ProblemaSaudeDTO {
-  descricao: string
+  descricao: string | null
   gravidade: string | null
 }
 
 interface MedicamentoDTO {
-  descricao: string
+  descricao: string | null
   dosagem: string | null
 }
 
@@ -282,7 +282,7 @@ export function FamiliaDetailPage() {
                       {familia.dependentes.map((d, i) => (
                         <Stack key={i} spacing={0.5}>
                           <Typography sx={{ overflowWrap: 'anywhere' }}>
-                            <Box component="span" sx={{ fontWeight: 700 }}>Nome: </Box>{d.nome}
+                            <Box component="span" sx={{ fontWeight: 700 }}>Nome: </Box>{d.nome ?? '—'}
                           </Typography>
                           <Typography>
                             <Box component="span" sx={{ fontWeight: 700 }}>Data de nascimento: </Box>{formatDate(d.dataNascimento)}
@@ -345,7 +345,7 @@ export function FamiliaDetailPage() {
                           <Typography sx={{ fontWeight: 700 }}>Problemas de saúde</Typography>
                           {familia.problemasSaude.map((p, i) => (
                             <Typography key={i} sx={{ overflowWrap: 'anywhere' }}>
-                              {p.descricao} — Gravidade: {p.gravidade ?? '—'}
+                              {p.descricao ?? '—'} — Gravidade: {p.gravidade ?? '—'}
                             </Typography>
                           ))}
                         </Stack>
@@ -355,7 +355,7 @@ export function FamiliaDetailPage() {
                           <Typography sx={{ fontWeight: 700 }}>Medicamentos utilizados</Typography>
                           {familia.medicamentos.map((m, i) => (
                             <Typography key={i} sx={{ overflowWrap: 'anywhere' }}>
-                              {m.descricao} — Dosagem: {m.dosagem ?? '—'}
+                              {m.descricao ?? '—'} — Dosagem: {m.dosagem ?? '—'}
                             </Typography>
                           ))}
                         </Stack>

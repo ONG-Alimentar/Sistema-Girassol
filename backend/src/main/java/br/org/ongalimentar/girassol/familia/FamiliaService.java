@@ -19,7 +19,10 @@ import br.org.ongalimentar.girassol.common.crud.CrudService;
  * {@code open-in-view=false}, as coleções lazy (telefones, endereços,
  * dependentes, saúde, substâncias, serviços e situação socioeconômica) são
  * inicializadas aqui, dentro da transação, para o {@code FamiliaResponse}
- * conseguir lê-las no controller.
+ * conseguir lê-las no controller — exceto em {@link #list}, que o
+ * {@code FamiliaController} mapeia para uma resposta enxuta (só escalares),
+ * sem tocar nas coleções: evita N×7 queries lazy por página de listagem (a
+ * listagem não usa esses dados).
  */
 @Service
 public class FamiliaService extends CrudService<Familia, Long> {
@@ -29,12 +32,9 @@ public class FamiliaService extends CrudService<Familia, Long> {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	@PreAuthorize("hasAuthority('FAMILIA:READ')")
 	public Page<Familia> list(Specification<Familia> filtro, Pageable pageable) {
-		Page<Familia> page = super.list(filtro, pageable);
-		page.forEach(FamiliaService::inicializarColecoes);
-		return page;
+		return super.list(filtro, pageable);
 	}
 
 	@Override
