@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Avatar, Box, Button, Card, CardActionArea, CardContent, Container, Divider, Stack, Typography } from '@mui/material'
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
@@ -11,72 +12,15 @@ import { useAuth } from '../../auth/useAuth'
 import { useConfirm } from '../../hooks/useConfirm'
 import { useToast } from '../../hooks/useToast'
 import { MODULES } from '../../navigation/modules'
-
-interface EnderecoDTO {
-  rua: string | null
-  bairro: string | null
-  numero: string | null
-  complemento: string | null
-  cidade: string | null
-  cep: string | null
-}
-
-interface DependenteDTO {
-  nome: string | null
-  dataNascimento: string | null
-  parentesco: string | null
-  ocupacao: string | null
-}
-
-interface SituacaoSocioeconomicaDTO {
-  profissao: string | null
-  escolaridade: string | null
-  tipoMoradia: 'PROPRIA' | 'ALUGADA' | 'CEDIDA' | 'OCUPACAO_IRREGULAR' | 'SITUACAO_DE_RUA' | null
-  renda: 'SEM_RENDA' | 'ATE_1_SALARIO_MINIMO' | 'DE_1_A_2_SALARIOS_MINIMOS' | 'DE_2_A_3_SALARIOS_MINIMOS' | 'ACIMA_DE_3_SALARIOS_MINIMOS' | null
-  beneficio: string | null
-  acessoAlimentacao: boolean | null
-}
-
-interface ProblemaSaudeDTO {
-  descricao: string | null
-  gravidade: string | null
-}
-
-interface MedicamentoDTO {
-  descricao: string | null
-  dosagem: string | null
-}
+import { getServicos } from '../../features/familias/servicoApi'
+import type { EnderecoRequest, FamiliaResponse, ServicoResponse } from '../../features/familias/types'
 
 /**
- * Família (campos escalares + coleções do FamiliaResponse). Tipo local para não
- * conflitar com o api/familias.ts em desenvolvimento no #49/#76; consolidar no
- * merge. As coleções são só leitura aqui — a edição delas é do módulo #4.
+ * Família (campos escalares + coleções do FamiliaResponse, consolidado com o
+ * shape usado pelo formulário de edição do #4 — ver features/familias/types).
+ * As coleções são só leitura aqui — a edição delas é do módulo #4.
  */
-interface Familia {
-  id: number
-  nome: string
-  nomeSocial: string | null
-  dataNascimento: string | null
-  genero: 'MASCULINO' | 'FEMININO' | 'OUTRO' | null
-  estadoCivil: 'SOLTEIRO' | 'CASADO' | 'DIVORCIADO' | 'VIUVO' | 'UNIAO_ESTAVEL' | null
-  indicacao: 'RECOMENDACAO_DE_AMIGOS_OU_CONHECIDOS' | 'REDES_SOCIAIS' | 'ENCAMINHADO_REDE_PUBLICA' | 'OUTRA_MANEIRA' | null
-  nomeMae: string | null
-  email: string | null
-  cpf: string | null
-  rg: string | null
-  nis: string | null
-  naturalidade: string | null
-  observacoes: string | null
-  dataCadastro: string | null
-  telefones: string[]
-  enderecos: EnderecoDTO[]
-  dependentes: DependenteDTO[]
-  situacaoSocioeconomica: SituacaoSocioeconomicaDTO | null
-  problemasSaude: ProblemaSaudeDTO[]
-  medicamentos: MedicamentoDTO[]
-  substancias: string[]
-  servicos: string[]
-}
+type Familia = FamiliaResponse
 
 const GENERO_LABELS: Record<string, string> = {
   MASCULINO: 'Masculino', FEMININO: 'Feminino', OUTRO: 'Outro',
@@ -115,7 +59,7 @@ function label(map: Record<string, string>, value: unknown): string {
 }
 
 /** "rua, numero - bairro, cidade", omitindo partes ausentes. */
-function formatEndereco(e: EnderecoDTO): string {
+function formatEndereco(e: EnderecoRequest): string {
   const linha = [e.rua, e.numero].filter(Boolean).join(', ')
   const local = [e.bairro, e.cidade].filter(Boolean).join(', ')
   const partes = [linha, local].filter(Boolean)
@@ -166,6 +110,26 @@ export function FamiliaDetailPage() {
   const services = MODULES.filter(
     (m) => FAMILY_SERVICE_PATHS.includes(m.path) && can(m.permission),
   )
+
+  const [servicosCatalogo, setServicosCatalogo] = useState<ServicoResponse[]>([])
+
+  useEffect(() => {
+    let ativo = true
+    getServicos()
+      .then((resultado) => {
+        if (ativo) setServicosCatalogo(resultado)
+      })
+      .catch(() => {
+        // catálogo é só para exibir o nome; sem ele, cai no fallback do id.
+      })
+    return () => {
+      ativo = false
+    }
+  }, [])
+
+  function nomeServico(id: number): string {
+    return servicosCatalogo.find((s) => s.id === id)?.nome ?? `Serviço #${id}`
+  }
 
   async function handleExcluir(familia: Familia) {
     const ok = await confirm({
@@ -228,7 +192,7 @@ export function FamiliaDetailPage() {
                         {familia.telefones.map((telefone, i) => (
                           <Typography key={`telefone-${i}`} sx={{ overflowWrap: 'anywhere' }}>
                             <Box component="span" sx={{ fontWeight: 700 }}>Telefone: </Box>
-                            {telefone}
+                            {telefone.numero}
                           </Typography>
                         ))}
                         {familia.enderecos.map((endereco, i) => (
@@ -364,7 +328,7 @@ export function FamiliaDetailPage() {
                         <Stack spacing={0.5}>
                           <Typography sx={{ fontWeight: 700 }}>Substâncias psicoativas</Typography>
                           {familia.substancias.map((s, i) => (
-                            <Typography key={i} sx={{ overflowWrap: 'anywhere' }}>{s}</Typography>
+                            <Typography key={i} sx={{ overflowWrap: 'anywhere' }}>{s.descricao}</Typography>
                           ))}
                         </Stack>
                       )}
@@ -373,15 +337,15 @@ export function FamiliaDetailPage() {
                 </Card>
               )}
 
-              {familia.servicos.length > 0 && (
+              {familia.servicosIds.length > 0 && (
                 <Card variant="outlined">
                   <CardContent>
                     <Typography component="h3" variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
                       Serviços utilizados
                     </Typography>
                     <Stack spacing={0.5}>
-                      {familia.servicos.map((s) => (
-                        <Typography key={s} sx={{ overflowWrap: 'anywhere' }}>{s}</Typography>
+                      {familia.servicosIds.map((id) => (
+                        <Typography key={id} sx={{ overflowWrap: 'anywhere' }}>{nomeServico(id)}</Typography>
                       ))}
                     </Stack>
                   </CardContent>

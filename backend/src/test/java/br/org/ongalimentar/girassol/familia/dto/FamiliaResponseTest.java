@@ -55,7 +55,7 @@ class FamiliaResponseTest {
 		FamiliaResponse response = FamiliaResponse.from(familia);
 
 		assertEquals(1, response.telefones().size());
-		assertEquals("53999990000", response.telefones().get(0));
+		assertEquals("53999990000", response.telefones().get(0).numero());
 
 		assertEquals(1, response.enderecos().size());
 		assertEquals("Rua das Flores", response.enderecos().get(0).rua());
@@ -76,8 +76,8 @@ class FamiliaResponseTest {
 		assertEquals(1, response.medicamentos().size());
 		assertEquals("2 jatos", response.medicamentos().get(0).dosagem());
 
-		assertEquals("Tabaco", response.substancias().get(0));
-		assertEquals("Orientação jurídica", response.servicos().get(0));
+		assertEquals("Tabaco", response.substancias().get(0).descricao());
+		assertEquals(1, response.servicosIds().size());
 	}
 
 	@Test
@@ -94,7 +94,7 @@ class FamiliaResponseTest {
 		assertTrue(response.problemasSaude().isEmpty());
 		assertTrue(response.medicamentos().isEmpty());
 		assertTrue(response.substancias().isEmpty());
-		assertTrue(response.servicos().isEmpty());
+		assertTrue(response.servicosIds().isEmpty());
 	}
 
 	@Test
@@ -114,7 +114,7 @@ class FamiliaResponseTest {
 		assertTrue(response.problemasSaude().isEmpty());
 		assertTrue(response.medicamentos().isEmpty());
 		assertTrue(response.substancias().isEmpty());
-		assertTrue(response.servicos().isEmpty());
+		assertTrue(response.servicosIds().isEmpty());
 	}
 
 	private static Servico novoServico(String nome) {
@@ -129,7 +129,7 @@ class FamiliaResponseTest {
 		familia.setNome("Família com situação parcial");
 		familia.setSituacaoSocioeconomica(new SituacaoSocioeconomica());
 
-		FamiliaResponse.SituacaoSocioeconomicaResumo situacao = FamiliaResponse.from(familia).situacaoSocioeconomica();
+		SituacaoSocioeconomicaResponse situacao = FamiliaResponse.from(familia).situacaoSocioeconomica();
 
 		assertNull(situacao.renda());
 		assertNull(situacao.tipoMoradia());

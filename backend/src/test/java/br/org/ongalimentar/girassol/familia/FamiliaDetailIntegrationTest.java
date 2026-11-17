@@ -98,15 +98,15 @@ class FamiliaDetailIntegrationTest {
 
 		mvc.perform(get("/api/familias/" + id))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.telefones[0]").value("53999990000"))
+				.andExpect(jsonPath("$.telefones[0].numero").value("53999990000"))
 				.andExpect(jsonPath("$.enderecos[0].rua").value("Rua das Flores"))
 				.andExpect(jsonPath("$.dependentes[0].parentesco").value("Filho"))
 				.andExpect(jsonPath("$.situacaoSocioeconomica.renda").value("ATE_1_SALARIO_MINIMO"))
 				.andExpect(jsonPath("$.situacaoSocioeconomica.acessoAlimentacao").value(true))
 				.andExpect(jsonPath("$.problemasSaude[0].gravidade").value("Moderada"))
 				.andExpect(jsonPath("$.medicamentos[0].dosagem").value("2 jatos"))
-				.andExpect(jsonPath("$.substancias[0]").value("Tabaco"))
-				.andExpect(jsonPath("$.servicos[0]").value("Orientação jurídica"));
+				.andExpect(jsonPath("$.substancias[0].descricao").value("Tabaco"))
+				.andExpect(jsonPath("$.servicosIds[0]").value(servico.getId()));
 	}
 
 	@Test
@@ -125,7 +125,7 @@ class FamiliaDetailIntegrationTest {
 				.andExpect(jsonPath("$.problemasSaude").isEmpty())
 				.andExpect(jsonPath("$.medicamentos").isEmpty())
 				.andExpect(jsonPath("$.substancias").isEmpty())
-				.andExpect(jsonPath("$.servicos").isEmpty());
+				.andExpect(jsonPath("$.servicosIds").isEmpty());
 	}
 
 	@Test
@@ -158,6 +158,6 @@ class FamiliaDetailIntegrationTest {
 				.andExpect(jsonPath("$.nome").value("Família Y Atualizada"))
 				.andExpect(jsonPath("$.telefones").isArray())
 				.andExpect(jsonPath("$.telefones").isEmpty())
-				.andExpect(jsonPath("$.servicos").isEmpty());
+				.andExpect(jsonPath("$.servicosIds").isEmpty());
 	}
 }

@@ -19,10 +19,11 @@ const familia = {
   naturalidade: 'Pelotas',
   observacoes: 'Sem observações.',
   dataCadastro: '2026-01-02',
-  telefones: ['53999990000'],
-  enderecos: [{ rua: 'Rua das Flores', bairro: 'Centro', numero: '42', complemento: 'Casa 2', cidade: 'Pelotas', cep: '96015000' }],
-  dependentes: [{ nome: 'João Silva', dataNascimento: '2012-08-03', parentesco: 'Filho', ocupacao: 'Estudante' }],
+  telefones: [{ id: 1, numero: '53999990000' }],
+  enderecos: [{ id: 1, rua: 'Rua das Flores', bairro: 'Centro', numero: '42', complemento: 'Casa 2', cidade: 'Pelotas', cep: '96015000' }],
+  dependentes: [{ id: 1, nome: 'João Silva', dataNascimento: '2012-08-03', parentesco: 'Filho', ocupacao: 'Estudante' }],
   situacaoSocioeconomica: {
+    id: 1,
     profissao: 'Costureira',
     escolaridade: 'Ensino médio',
     tipoMoradia: 'ALUGADA',
@@ -30,11 +31,13 @@ const familia = {
     beneficio: 'Bolsa Família',
     acessoAlimentacao: true,
   },
-  problemasSaude: [{ descricao: 'Asma', gravidade: 'Moderada' }],
-  medicamentos: [{ descricao: 'Salbutamol', dosagem: '2 jatos' }],
-  substancias: ['Tabaco'],
-  servicos: ['Cesta básica'],
+  problemasSaude: [{ id: 1, descricao: 'Asma', gravidade: 'Moderada' }],
+  medicamentos: [{ id: 1, descricao: 'Salbutamol', dosagem: '2 jatos' }],
+  substancias: [{ id: 1, descricao: 'Tabaco' }],
+  servicosIds: [1],
 }
+
+const servicosCatalogo = [{ id: 1, nome: 'Cesta básica' }]
 
 const familiaVazia = {
   id: 8,
@@ -59,11 +62,14 @@ const familiaVazia = {
   problemasSaude: [],
   medicamentos: [],
   substancias: [],
-  servicos: [],
+  servicosIds: [],
 }
 
-/** Trata GET/DELETE de /api/familias/7 e /8; outros ids → 404. */
+/** Trata GET/DELETE de /api/familias/7 e /8, e o catálogo de /api/servicos; outros ids → 404. */
 function familiaHandler(url: string, init?: RequestInit): Response {
+  if (url.endsWith('/api/servicos')) {
+    return jsonResponse(servicosCatalogo)
+  }
   if (url.endsWith('/api/familias/7')) {
     if (init?.method === 'DELETE') return new Response(null, { status: 204 })
     return jsonResponse(familia)
