@@ -1,46 +1,91 @@
 package br.org.ongalimentar.girassol.familia.dto;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.org.ongalimentar.girassol.familia.EstadoCivil;
 import br.org.ongalimentar.girassol.familia.Familia;
 import br.org.ongalimentar.girassol.familia.Genero;
 import br.org.ongalimentar.girassol.familia.Indicacao;
+import br.org.ongalimentar.girassol.familia.Servico;
 
-/** DTO de saída da {@link Familia} (campos escalares do cadastro). */
 public record FamiliaResponse(
-		Long id,
-		String nome,
-		String nomeSocial,
-		LocalDate dataNascimento,
-		Genero genero,
-		EstadoCivil estadoCivil,
-		Indicacao indicacao,
-		String nomeMae,
-		String email,
-		String cpf,
-		String rg,
-		String nis,
-		String naturalidade,
-		String observacoes,
-		LocalDate dataCadastro) {
+        Long id,
+        String nome,
+        String nomeSocial,
+        LocalDate dataNascimento,
+        Genero genero,
+        EstadoCivil estadoCivil,
+        Indicacao indicacao,
+        String nomeMae,
+        String email,
+        String cpf,
+        String rg,
+        String nis,
+        String naturalidade,
+        String observacoes,
+        LocalDate dataCadastro,
+        List<TelefoneResponse> telefones,
+		List<EnderecoResponse> enderecos,
+		List<DependenteResponse> dependentes,
+		List<ProblemaSaudeResponse> problemasSaude,
+		List<MedicamentoResponse> medicamentos,
+		List<SubstanciaResponse> substancias,
+		SituacaoSocioeconomicaResponse situacaoSocioeconomica,
+		Set<Long> servicosIds
+) {
 
-	public static FamiliaResponse from(Familia f) {
-		return new FamiliaResponse(
-				f.getId(),
-				f.getNome(),
-				f.getNomeSocial(),
-				f.getDataNascimento(),
-				f.getGenero(),
-				f.getEstadoCivil(),
-				f.getIndicacao(),
-				f.getNomeMae(),
-				f.getEmail(),
-				f.getCpf(),
-				f.getRg(),
-				f.getNis(),
-				f.getNaturalidade(),
-				f.getObservacoes(),
-				f.getDataCadastro());
-	}
+    public static FamiliaResponse from(Familia f) {
+        return new FamiliaResponse(
+                f.getId(),
+                f.getNome(),
+                f.getNomeSocial(),
+                f.getDataNascimento(),
+                f.getGenero(),
+                f.getEstadoCivil(),
+                f.getIndicacao(),
+                f.getNomeMae(),
+                f.getEmail(),
+                f.getCpf(),
+                f.getRg(),
+                f.getNis(),
+                f.getNaturalidade(),
+                f.getObservacoes(),
+                f.getDataCadastro(),
+                f.getTelefones()
+                        .stream()
+                        .map(TelefoneResponse::from)
+                        .toList(),
+				f.getEnderecos()
+						.stream()
+						.map(EnderecoResponse::from)
+						.toList(),
+				f.getDependentes()
+						.stream()
+						.map(DependenteResponse::from)
+						.toList(),
+				f.getProblemasSaude()
+						.stream()
+						.map(ProblemaSaudeResponse::from)
+						.toList(),
+				f.getMedicamentos()
+						.stream()
+						.map(MedicamentoResponse::from)
+						.toList(),
+				f.getSubstancias()
+						.stream()
+						.map(SubstanciaResponse::from)
+						.toList(),
+				SituacaoSocioeconomicaResponse.from(
+						f.getSituacaoSocioeconomica()
+				),
+				f.getServicos()
+					.stream()
+					.map(Servico::getId)
+					.collect(Collectors.toSet()
+				)
+		);
+    }
 }

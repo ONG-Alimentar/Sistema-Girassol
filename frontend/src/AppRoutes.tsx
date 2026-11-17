@@ -40,6 +40,19 @@ const ADMIN_DETAIL_ROUTES: { path: string; permission: Permission; element: Reac
 export function AppRoutes() {
   return (
     <Routes>
+
+      // tirar depois
+
+      {import.meta.env.DEV && (
+      <Route
+        path="/teste-familia"
+        element={
+          <FamiliaFormPage />
+        }
+      />
+    )}
+    // tirar depois
+
       {/* Pública */}
       <Route path="/login" element={<LoginPage />} />
 
@@ -79,7 +92,7 @@ export function AppRoutes() {
               }
             />
           ))}
-
+          /*
           <Route
             path="familias/nova"
             element={
@@ -97,6 +110,7 @@ export function AppRoutes() {
               </PermissionGuard>
             }
           />  
+          */
           
           <Route path="403" element={<ForbiddenPage />} />
 
