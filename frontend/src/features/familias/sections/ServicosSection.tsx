@@ -53,7 +53,7 @@ export function ServicosSection({
 
   if (loading) {
     return (
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
         <CircularProgress size={20} />
         <span>Carregando serviços...</span>
       </Stack>

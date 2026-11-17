@@ -1,4 +1,9 @@
-import { Box, Button, Card, CardActionArea, Container, Stack, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { Avatar, Box, Button, Card, CardActionArea, CardContent, Container, Divider, Stack, Typography } from '@mui/material'
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import PersonOutlineIcon from '@mui/icons-material/PersonOutlineOutlined'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ApiError, apiFetch } from '../../api/client'
 import { ConfirmDialog } from '../../components/common/ConfirmDialog'
@@ -7,28 +12,15 @@ import { useAuth } from '../../auth/useAuth'
 import { useConfirm } from '../../hooks/useConfirm'
 import { useToast } from '../../hooks/useToast'
 import { MODULES } from '../../navigation/modules'
+import { getServicos } from '../../features/familias/servicoApi'
+import type { EnderecoRequest, FamiliaResponse, ServicoResponse } from '../../features/familias/types'
 
 /**
- * Família (campos escalares do FamiliaResponse). Tipo local para não conflitar
- * com o api/familias.ts em desenvolvimento no #49/#76; consolidar no merge.
+ * Família (campos escalares + coleções do FamiliaResponse, consolidado com o
+ * shape usado pelo formulário de edição do #4 — ver features/familias/types).
+ * As coleções são só leitura aqui — a edição delas é do módulo #4.
  */
-interface Familia {
-  id: number
-  nome: string
-  nomeSocial: string | null
-  dataNascimento: string | null
-  genero: 'MASCULINO' | 'FEMININO' | 'OUTRO' | null
-  estadoCivil: 'SOLTEIRO' | 'CASADO' | 'DIVORCIADO' | 'VIUVO' | 'UNIAO_ESTAVEL' | null
-  indicacao: 'RECOMENDACAO_DE_AMIGOS_OU_CONHECIDOS' | 'REDES_SOCIAIS' | 'ENCAMINHADO_REDE_PUBLICA' | 'OUTRA_MANEIRA' | null
-  nomeMae: string | null
-  email: string | null
-  cpf: string | null
-  rg: string | null
-  nis: string | null
-  naturalidade: string | null
-  observacoes: string | null
-  dataCadastro: string | null
-}
+type Familia = FamiliaResponse
 
 const GENERO_LABELS: Record<string, string> = {
   MASCULINO: 'Masculino', FEMININO: 'Feminino', OUTRO: 'Outro',
@@ -43,6 +35,17 @@ const INDICACAO_LABELS: Record<string, string> = {
   ENCAMINHADO_REDE_PUBLICA: 'Encaminhado pela rede pública',
   OUTRA_MANEIRA: 'Outra maneira',
 }
+const TIPO_MORADIA_LABELS: Record<string, string> = {
+  PROPRIA: 'Própria', ALUGADA: 'Alugada', CEDIDA: 'Cedida',
+  OCUPACAO_IRREGULAR: 'Ocupação irregular', SITUACAO_DE_RUA: 'Situação de rua',
+}
+const RENDA_LABELS: Record<string, string> = {
+  SEM_RENDA: 'Sem renda',
+  ATE_1_SALARIO_MINIMO: 'Até 1 salário mínimo',
+  DE_1_A_2_SALARIOS_MINIMOS: 'De 1 a 2 salários mínimos',
+  DE_2_A_3_SALARIOS_MINIMOS: 'De 2 a 3 salários mínimos',
+  ACIMA_DE_3_SALARIOS_MINIMOS: 'Acima de 3 salários mínimos',
+}
 
 /** dd/mm/aaaa a partir de uma data ISO (yyyy-mm-dd). */
 function formatDate(value: unknown): string {
@@ -55,20 +58,37 @@ function label(map: Record<string, string>, value: unknown): string {
   return typeof value === 'string' ? (map[value] ?? value) : '—'
 }
 
-const fields: DetailField<Familia>[] = [
-  { field: 'nome', label: 'Nome' },
+/** "rua, numero - bairro, cidade", omitindo partes ausentes. */
+function formatEndereco(e: EnderecoRequest): string {
+  const linha = [e.rua, e.numero].filter(Boolean).join(', ')
+  const local = [e.bairro, e.cidade].filter(Boolean).join(', ')
+  const partes = [linha, local].filter(Boolean)
+  return partes.length ? partes.join(' - ') : '—'
+}
+
+function simNao(value: boolean | null): string {
+  return value == null ? '—' : value ? 'Sim' : 'Não'
+}
+
+// Ordem e agrupamento dos "Dados pessoais" fiéis ao wireframe (docs/wireframes,
+// telas 30-33): nome, filiação/nascimento, documentos, contato — seguidos dos
+// campos que o wireframe não previa (indicação/cadastro). Telefone e Endereço
+// (listas) são renderizados à parte, uma linha por item, entre NIS e Email.
+const personalFieldsBeforeContact: DetailField<Familia>[] = [
+  { field: 'nome', label: 'Nome completo' },
   { field: 'nomeSocial', label: 'Nome social' },
   { field: 'dataNascimento', label: 'Data de nascimento', render: formatDate },
+  { field: 'naturalidade', label: 'Naturalidade' },
   { field: 'genero', label: 'Gênero', render: (v) => label(GENERO_LABELS, v) },
   { field: 'estadoCivil', label: 'Estado civil', render: (v) => label(ESTADO_CIVIL_LABELS, v) },
   { field: 'nomeMae', label: 'Nome da mãe' },
   { field: 'cpf', label: 'CPF' },
   { field: 'rg', label: 'RG' },
   { field: 'nis', label: 'NIS' },
-  { field: 'email', label: 'E-mail' },
-  { field: 'naturalidade', label: 'Naturalidade' },
+]
+const personalFieldsAfterContact: DetailField<Familia>[] = [
+  { field: 'email', label: 'Email' },
   { field: 'indicacao', label: 'Como chegou', render: (v) => label(INDICACAO_LABELS, v) },
-  { field: 'observacoes', label: 'Observações' },
   { field: 'dataCadastro', label: 'Cadastrada em', render: formatDate },
 ]
 
@@ -90,6 +110,26 @@ export function FamiliaDetailPage() {
   const services = MODULES.filter(
     (m) => FAMILY_SERVICE_PATHS.includes(m.path) && can(m.permission),
   )
+
+  const [servicosCatalogo, setServicosCatalogo] = useState<ServicoResponse[]>([])
+
+  useEffect(() => {
+    let ativo = true
+    getServicos()
+      .then((resultado) => {
+        if (ativo) setServicosCatalogo(resultado)
+      })
+      .catch(() => {
+        // catálogo é só para exibir o nome; sem ele, cai no fallback do id.
+      })
+    return () => {
+      ativo = false
+    }
+  }, [])
+
+  function nomeServico(id: number): string {
+    return servicosCatalogo.find((s) => s.id === id)?.nome ?? `Serviço #${id}`
+  }
 
   async function handleExcluir(familia: Familia) {
     const ok = await confirm({
@@ -113,62 +153,248 @@ export function FamiliaDetailPage() {
   }
 
   return (
-    <Container component="main" maxWidth="md" sx={{ py: 1 }}>
-      <Stack spacing={3}>
-        <Button variant="outlined" onClick={() => navigate('/familias')} sx={{ alignSelf: 'flex-start' }}>
-          Voltar à listagem
-        </Button>
+    <Container component="main" maxWidth="sm" sx={{ py: 1 }}>
+      <Stack spacing={2}>
         <Typography component="h1" variant="h4">Detalhes da família</Typography>
 
         <DetailView<Familia>
           endpoint="/api/familias"
           id={id}
-          fields={fields}
-          onEdit={can('FAMILIA:UPDATE')
-            ? () => showToast('A edição de famílias chega no #51.', 'info')
-            : undefined}
+          fields={[]}
           renderActions={(familia) => (
-            <Stack spacing={3}>
-              {services.length > 0 && (
-                <Box>
-                  <Typography variant="h6" sx={{ mb: 1.5 }}>Serviços da família</Typography>
-                  <Box
-                    sx={{
-                      display: 'grid',
-                      gap: 2,
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-                    }}
-                  >
-                    {services.map((m) => {
-                      const Icon = m.icon
-                      return (
-                        <Card key={m.path}>
-                          <CardActionArea
-                            onClick={() => navigate(`/${m.path}?familia=${familia.id}`)}
-                            sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, p: 2, minHeight: 112 }}
-                          >
-                            <Icon sx={{ fontSize: 36, color: 'primary.main' }} />
-                            <Typography variant="subtitle2" component="span" sx={{ fontWeight: 700, textAlign: 'center' }}>
-                              {m.label}
+            <Stack spacing={2}>
+              <Card variant="outlined">
+                <CardContent>
+                  <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+                    <Avatar sx={{ bgcolor: 'secondary.main', color: 'primary.main', width: 64, height: 64 }}>
+                      <PersonOutlineIcon sx={{ fontSize: 44 }} aria-hidden="true" />
+                    </Avatar>
+                    <Typography component="h2" variant="h5" sx={{ fontWeight: 700, overflowWrap: 'anywhere' }}>
+                      {familia.nome}
+                    </Typography>
+                  </Stack>
+
+                  <Card variant="outlined" sx={{ mt: 3 }}>
+                    <CardContent>
+                      <Typography component="h3" variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+                        Dados pessoais
+                      </Typography>
+                      <Stack spacing={1}>
+                        {personalFieldsBeforeContact.map((f) => {
+                          const value = familia[f.field]
+                          return (
+                            <Typography key={String(f.field)} sx={{ overflowWrap: 'anywhere' }}>
+                              <Box component="span" sx={{ fontWeight: 700 }}>{f.label}: </Box>
+                              {f.render ? f.render(value, familia) : String(value ?? '—')}
                             </Typography>
-                          </CardActionArea>
-                        </Card>
-                      )
-                    })}
-                  </Box>
-                </Box>
+                          )
+                        })}
+                        {familia.telefones.map((telefone, i) => (
+                          <Typography key={`telefone-${i}`} sx={{ overflowWrap: 'anywhere' }}>
+                            <Box component="span" sx={{ fontWeight: 700 }}>Telefone: </Box>
+                            {telefone.numero}
+                          </Typography>
+                        ))}
+                        {familia.enderecos.map((endereco, i) => (
+                          <Typography key={`endereco-${i}`} sx={{ overflowWrap: 'anywhere' }}>
+                            <Box component="span" sx={{ fontWeight: 700 }}>Endereço: </Box>
+                            {formatEndereco(endereco)}
+                          </Typography>
+                        ))}
+                        {personalFieldsAfterContact.map((f) => {
+                          const value = familia[f.field]
+                          return (
+                            <Typography key={String(f.field)} sx={{ overflowWrap: 'anywhere' }}>
+                              <Box component="span" sx={{ fontWeight: 700 }}>{f.label}: </Box>
+                              {f.render ? f.render(value, familia) : String(value ?? '—')}
+                            </Typography>
+                          )
+                        })}
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+
+              {services.map((m) => {
+                const Icon = m.icon
+                const nome = m.label.charAt(0).toLowerCase() + m.label.slice(1)
+                return (
+                  <Card key={m.path} variant="outlined">
+                    <CardActionArea
+                      onClick={() => navigate(`/${m.path}?familia=${familia.id}`)}
+                      sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, p: 2 }}
+                    >
+                      <Typography component="span" variant="h6" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
+                        Gerenciar {nome}
+                      </Typography>
+                      <Avatar sx={{ bgcolor: 'secondary.main', color: 'primary.main', width: 56, height: 56, flexShrink: 0 }}>
+                        <Icon sx={{ fontSize: 32 }} aria-hidden="true" />
+                      </Avatar>
+                    </CardActionArea>
+                  </Card>
+                )
+              })}
+
+              {familia.dependentes.length > 0 && (
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography component="h3" variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+                      Dependentes
+                    </Typography>
+                    <Stack spacing={2} divider={<Divider />}>
+                      {familia.dependentes.map((d, i) => (
+                        <Stack key={i} spacing={0.5}>
+                          <Typography sx={{ overflowWrap: 'anywhere' }}>
+                            <Box component="span" sx={{ fontWeight: 700 }}>Nome: </Box>{d.nome ?? '—'}
+                          </Typography>
+                          <Typography>
+                            <Box component="span" sx={{ fontWeight: 700 }}>Data de nascimento: </Box>{formatDate(d.dataNascimento)}
+                          </Typography>
+                          <Typography sx={{ overflowWrap: 'anywhere' }}>
+                            <Box component="span" sx={{ fontWeight: 700 }}>Parentesco: </Box>{d.parentesco ?? '—'}
+                          </Typography>
+                          <Typography sx={{ overflowWrap: 'anywhere' }}>
+                            <Box component="span" sx={{ fontWeight: 700 }}>Ocupação/Escola: </Box>{d.ocupacao ?? '—'}
+                          </Typography>
+                        </Stack>
+                      ))}
+                    </Stack>
+                  </CardContent>
+                </Card>
               )}
 
-              {can('FAMILIA:DELETE') && (
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => handleExcluir(familia)}
-                  sx={{ alignSelf: 'flex-start' }}
-                >
-                  Excluir
-                </Button>
+              {familia.situacaoSocioeconomica && (
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography component="h3" variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+                      Situação socioeconômica
+                    </Typography>
+                    <Stack spacing={1}>
+                      <Typography sx={{ overflowWrap: 'anywhere' }}>
+                        <Box component="span" sx={{ fontWeight: 700 }}>Profissão: </Box>{familia.situacaoSocioeconomica.profissao ?? '—'}
+                      </Typography>
+                      <Typography sx={{ overflowWrap: 'anywhere' }}>
+                        <Box component="span" sx={{ fontWeight: 700 }}>Escolaridade: </Box>{familia.situacaoSocioeconomica.escolaridade ?? '—'}
+                      </Typography>
+                      <Typography>
+                        <Box component="span" sx={{ fontWeight: 700 }}>Tipo de moradia: </Box>
+                        {label(TIPO_MORADIA_LABELS, familia.situacaoSocioeconomica.tipoMoradia)}
+                      </Typography>
+                      <Typography>
+                        <Box component="span" sx={{ fontWeight: 700 }}>Renda: </Box>
+                        {label(RENDA_LABELS, familia.situacaoSocioeconomica.renda)}
+                      </Typography>
+                      <Typography sx={{ overflowWrap: 'anywhere' }}>
+                        <Box component="span" sx={{ fontWeight: 700 }}>Benefício(s): </Box>{familia.situacaoSocioeconomica.beneficio ?? '—'}
+                      </Typography>
+                      <Typography>
+                        <Box component="span" sx={{ fontWeight: 700 }}>Possui acesso à alimentação básica diariamente? </Box>
+                        {simNao(familia.situacaoSocioeconomica.acessoAlimentacao)}
+                      </Typography>
+                    </Stack>
+                  </CardContent>
+                </Card>
               )}
+
+              {(familia.problemasSaude.length > 0 || familia.medicamentos.length > 0 || familia.substancias.length > 0) && (
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography component="h3" variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+                      Saúde
+                    </Typography>
+                    <Stack spacing={2}>
+                      {familia.problemasSaude.length > 0 && (
+                        <Stack spacing={0.5}>
+                          <Typography sx={{ fontWeight: 700 }}>Problemas de saúde</Typography>
+                          {familia.problemasSaude.map((p, i) => (
+                            <Typography key={i} sx={{ overflowWrap: 'anywhere' }}>
+                              {p.descricao ?? '—'} — Gravidade: {p.gravidade ?? '—'}
+                            </Typography>
+                          ))}
+                        </Stack>
+                      )}
+                      {familia.medicamentos.length > 0 && (
+                        <Stack spacing={0.5}>
+                          <Typography sx={{ fontWeight: 700 }}>Medicamentos utilizados</Typography>
+                          {familia.medicamentos.map((m, i) => (
+                            <Typography key={i} sx={{ overflowWrap: 'anywhere' }}>
+                              {m.descricao ?? '—'} — Dosagem: {m.dosagem ?? '—'}
+                            </Typography>
+                          ))}
+                        </Stack>
+                      )}
+                      {familia.substancias.length > 0 && (
+                        <Stack spacing={0.5}>
+                          <Typography sx={{ fontWeight: 700 }}>Substâncias psicoativas</Typography>
+                          {familia.substancias.map((s, i) => (
+                            <Typography key={i} sx={{ overflowWrap: 'anywhere' }}>{s.descricao}</Typography>
+                          ))}
+                        </Stack>
+                      )}
+                    </Stack>
+                  </CardContent>
+                </Card>
+              )}
+
+              {familia.servicosIds.length > 0 && (
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography component="h3" variant="h6" sx={{ textAlign: 'center', mb: 2 }}>
+                      Serviços utilizados
+                    </Typography>
+                    <Stack spacing={0.5}>
+                      {familia.servicosIds.map((id) => (
+                        <Typography key={id} sx={{ overflowWrap: 'anywhere' }}>{nomeServico(id)}</Typography>
+                      ))}
+                    </Stack>
+                  </CardContent>
+                </Card>
+              )}
+
+              {familia.observacoes && (
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography sx={{ overflowWrap: 'anywhere' }}>
+                      <Box component="span" sx={{ fontWeight: 700 }}>Observações: </Box>{familia.observacoes}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              )}
+
+              <Stack spacing={1} sx={{ pt: 1 }}>
+                <Stack direction="row" spacing={3}>
+                  {can('FAMILIA:UPDATE') && (
+                    <Button
+                      variant="text"
+                      startIcon={<EditOutlinedIcon />}
+                      onClick={() => showToast('A edição de famílias chega no #51.', 'info')}
+                      sx={{ fontWeight: 700 }}
+                    >
+                      Editar
+                    </Button>
+                  )}
+                  {can('FAMILIA:DELETE') && (
+                    <Button
+                      variant="text"
+                      color="error"
+                      startIcon={<DeleteOutlineIcon />}
+                      onClick={() => handleExcluir(familia)}
+                      sx={{ fontWeight: 700 }}
+                    >
+                      Excluir
+                    </Button>
+                  )}
+                </Stack>
+                <Button
+                  variant="text"
+                  startIcon={<ArrowBackOutlinedIcon />}
+                  onClick={() => navigate('/familias')}
+                  sx={{ fontWeight: 700, alignSelf: 'flex-start' }}
+                >
+                  Voltar
+                </Button>
+              </Stack>
             </Stack>
           )}
         />

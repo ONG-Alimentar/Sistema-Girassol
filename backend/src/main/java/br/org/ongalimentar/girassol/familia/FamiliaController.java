@@ -2,12 +2,17 @@ package br.org.ongalimentar.girassol.familia;
 
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.org.ongalimentar.girassol.common.crud.CrudController;
 import br.org.ongalimentar.girassol.common.crud.CrudService;
+import br.org.ongalimentar.girassol.common.crud.PaginatedList;
 import br.org.ongalimentar.girassol.familia.dto.FamiliaRequest;
 import br.org.ongalimentar.girassol.familia.dto.FamiliaResponse;
 import br.org.ongalimentar.girassol.familia.dto.MedicamentoRequest;
@@ -47,6 +52,18 @@ public class FamiliaController extends CrudController<Familia, Long, FamiliaRequ
 	@Override
 	protected CrudService<Familia, Long> service() {
 		return service;
+	}
+
+	/**
+	 * Sobrescreve a listagem genérica para mapear com {@link FamiliaResponse#paraListagem}
+	 * em vez de {@link #toResponse} — a listagem não usa as coleções da família
+	 * (telefones, dependentes, saúde, etc.), então evita inicializá-las por linha.
+	 */
+	@Override
+	@GetMapping
+	public PaginatedList<FamiliaResponse> listar(@RequestParam(required = false) Map<String, String> params, Pageable pageable) {
+		Page<Familia> page = service().list(filtro(params == null ? Map.of() : params), pageable);
+		return PaginatedList.from(page, FamiliaResponse::paraListagem);
 	}
 
 	@Override
