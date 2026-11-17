@@ -8,21 +8,6 @@ import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Guarda de regressão para o cookie de sessão em ambiente cross-site.
- *
- * <p>Em produção o front (GitHub Pages) e o backend (Render) estão em origens
- * diferentes, então o cookie de sessão só é aceito/enviado pelo browser com
- * {@code SameSite=None} + {@code Secure}. Já houve regressão em que o valor
- * {@code Lax} derrubava a autenticação em prod (o browser descartava o cookie
- * do login cross-site) — este teste existe para impedir que isso volte.
- *
- * <p>É um teste de arquivo (lê o classpath), de propósito: valida os valores
- * exatos dos properties sem subir o contexto Spring nem o banco, mantendo-o
- * rápido no {@code ./mvnw verify} do CI. O profile base ({@code application.properties})
- * é o que vale em prod (não há {@code application-prod.properties}); o profile
- * {@code dev} sobrescreve para o cenário same-site/HTTP local.
- */
 class SessionCookieConfigTest {
 
 	private static final String SAME_SITE = "server.servlet.session.cookie.same-site";

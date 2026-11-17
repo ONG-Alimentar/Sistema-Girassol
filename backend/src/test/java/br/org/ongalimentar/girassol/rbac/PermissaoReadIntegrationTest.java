@@ -22,11 +22,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import br.org.ongalimentar.girassol.TestcontainersConfiguration;
 
-/**
- * Valida a API somente-leitura de {@code /api/permissoes} (administração RBAC, #3):
- * listagem paginada, busca por código, detalhe, 404, a barreira RBAC (403) e que a
- * escrita não é exposta (sem endpoints POST/PUT/DELETE).
- */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @WithMockUser(authorities = "PERMISSAO:READ")

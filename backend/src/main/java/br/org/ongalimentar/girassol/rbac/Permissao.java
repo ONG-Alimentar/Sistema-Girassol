@@ -11,14 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
-/**
- * Permissão granular no formato {@code MODULO:ACAO} (ex.: {@code FAMILIA:CREATE}).
- *
- * <p>Lado <b>inverso</b> da relação N:N com {@link Cargo}: o dono do vínculo é o
- * {@code Cargo} (tabela de junção {@code cargo_permissao}). O catálogo e o
- * mapeamento cargo→permissão ficam no banco, populados por seed na #46 — ver
- * {@code docs/seguranca/rbac.md}.
- */
 @Entity
 @Table(name = "permissao")
 public class Permissao {

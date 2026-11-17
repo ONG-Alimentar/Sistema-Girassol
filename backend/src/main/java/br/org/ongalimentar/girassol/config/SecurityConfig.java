@@ -20,17 +20,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-/**
- * Configuração de segurança do RBAC permission-based (ver {@code docs/seguranca/rbac.md}).
- *
- * <p>Defesa em profundidade: barreira grosseira no {@link SecurityFilterChain} (HTTP)
- * + barreira fina por método ({@code @EnableMethodSecurity} + {@code @PreAuthorize}
- * nos services). A autenticação é <b>por sessão (cookie)</b>, casando com o
- * {@code credentials: 'include'} do front.
- *
- * <p><b>CSRF desabilitado</b>: decisão consciente para o protótipo — o cliente SPA
- * não envia token CSRF. Reavaliar antes de um uso em produção com dados reais.
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

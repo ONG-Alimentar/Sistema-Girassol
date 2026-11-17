@@ -23,12 +23,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import br.org.ongalimentar.girassol.TestcontainersConfiguration;
 
-/**
- * Valida o CRUD genérico (#29) através do exemplo {@code /api/familias}: ciclo
- * completo, formato paginado da listagem, formato de erro de validação (400) e
- * de não-encontrado (404), e a barreira RBAC (403). Usa Postgres real
- * (Testcontainers) e MockMvc autenticado via {@code @WithMockUser}.
- */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @WithMockUser(authorities = { "FAMILIA:READ", "FAMILIA:CREATE", "FAMILIA:UPDATE", "FAMILIA:DELETE" })

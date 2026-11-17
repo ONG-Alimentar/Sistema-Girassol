@@ -1,4 +1,3 @@
-/** Contrato compartilhado com common/crud/PaginatedList.java (#29). */
 export interface PaginatedList<T> {
   content: T[]
   /** Índice da página na API, começando em zero. */

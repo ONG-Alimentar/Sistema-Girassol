@@ -39,7 +39,7 @@ export interface ModuleDef {
  *
  * Jurídico e Psicológico ficam SEPARADOS de propósito: o RBAC isola esses
  * atendimentos (LGPD), então cada um só aparece para quem tem a permissão.
- * A administração RBAC (#3) — Usuários, Cargos e Permissões — tem página real
+ * A administração RBAC — Usuários, Cargos e Permissões — tem página real
  * (component) e só aparece para o Administrador. PROJETO/FINANCEIRO ficam fora
  * deste menu.
  */

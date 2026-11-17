@@ -20,7 +20,6 @@ const filters: ListFilter[] = [
   { param: 'endDate', label: 'Data final', type: 'date' },
 ]
 
-/** Consumidor de exemplo da #23; não substitui as telas de domínio. */
 export function ExampleListPage() {
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()

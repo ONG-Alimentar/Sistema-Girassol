@@ -4,7 +4,6 @@ export interface UsuarioCargoResumo {
   nome: string
 }
 
-/** Item de UsuarioAdminResponse usado na listagem de administração (#3). */
 export interface UsuarioListItem {
   id: number
   nome: string

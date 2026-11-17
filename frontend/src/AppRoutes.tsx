@@ -23,21 +23,12 @@ const ExampleListPage = import.meta.env.DEV ? lazy(() => import('./pages/example
 const ExampleDetailPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleDetailPage').then((module) => ({ default: module.ExampleDetailPage }))) : () => null
 const ExampleEditPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleEditPage').then((module) => ({ default: module.ExampleEditPage }))) : () => null
 
-// Telas de detalhe da administração RBAC (#3) — sub-rotas de cada listagem, fora
-// do menu; usam o DetailView (#24) e a permissão de leitura da entidade.
 const ADMIN_DETAIL_ROUTES: { path: string; permission: Permission; element: ReactNode }[] = [
   { path: 'admin/usuarios/:id', permission: 'USUARIO:READ', element: <UsuarioDetailPage /> },
   { path: 'admin/cargos/:id', permission: 'CARGO:READ', element: <CargoDetailPage /> },
   { path: 'admin/permissoes/:id', permission: 'PERMISSAO:READ', element: <PermissaoDetailPage /> },
 ]
 
-// Os módulos protegidos vêm do registro único em navigation/modules.ts
-// (compartilhado com o drawer e a home). Cada um vira uma rota cujo elemento é
-// envolvido por PermissionGuard (redirect → /403 quando falta a permissão). O
-// módulo renderiza sua página real (component) ou, se ainda não implementada, o
-// ModulePlaceholder.
-
-/** Árvore de rotas da aplicação. */
 export function AppRoutes() {
   return (
     <Routes>
@@ -55,8 +46,6 @@ export function AppRoutes() {
         )}
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
-          {/* Detalhe-hub da família (#50). O /familias (listagem, #49) vem do
-              registro de MÓDULOS abaixo (placeholder até a PR da listagem). */}
           <Route
             path="familias/nova"
             element={

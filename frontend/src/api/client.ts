@@ -1,6 +1,3 @@
-// Cliente de API centralizado: um único ponto para base URL, headers e
-// tratamento de erro. Todas as chamadas ao backend passam por `apiFetch`.
-
 // Base da API, configurável por ambiente (ver .env / VITE_API_URL). Sem barra
 // final para evitar '//' ao concatenar com o path.
 const API_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')

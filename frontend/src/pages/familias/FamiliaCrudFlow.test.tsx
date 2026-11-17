@@ -3,13 +3,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { jsonResponse, renderAuthedApp } from '../../test/appRender.tsx'
 import type { Permission } from '../../auth/permissions.ts'
 
-/**
- * Fluxo ponta-a-ponta do CRUD de família (#51): cria, lê (lista + detalhe),
- * atualiza e exclui, tudo através da UI real (rotas, permissões, formulário
- * unificado) — não chama as funções de `familiaApi` diretamente. O "backend"
- * é um fetch mock com estado em memória, para que GET/POST/PUT/DELETE se
- * comportem de forma consistente entre si, como um servidor de verdade.
- */
 function criarBackendFamilias() {
   const db: Record<string, unknown>[] = []
   let nextId = 1
@@ -118,12 +111,10 @@ describe('CRUD de família ponta-a-ponta (#51)', () => {
       fetchHandler: backend.handler,
     })
 
-    // 1. Listagem vazia + botão de criação visível.
     expect(await screen.findByRole('heading', { name: 'Famílias atendidas' })).toBeInTheDocument()
     expect(await screen.findByText('Nenhuma família encontrada')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Nova família' }))
 
-    // 2. Formulário de criação: preenche nome + um telefone, envia.
     expect(await screen.findByRole('heading', { name: 'Cadastrar família' })).toBeInTheDocument()
     fireEvent.change(screen.getByRole('textbox', { name: 'Nome' }), { target: { value: 'Família Teste E2E' } })
 
@@ -134,12 +125,10 @@ describe('CRUD de família ponta-a-ponta (#51)', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Cadastrar' }))
 
-    // 3. POST disparado e navegação para o detalhe recém-criado (id=1).
     await waitFor(() => expect(window.location.pathname).toBe('/Sistema-Girassol/familias/1'))
     expect(await screen.findByRole('heading', { name: 'Família Teste E2E' })).toBeInTheDocument()
     expect(screen.getByText(/53999998888/)).toBeInTheDocument()
 
-    // 4. Editar: navega para o formulário de edição com os dados pré-carregados.
     fireEvent.click(screen.getByRole('button', { name: 'Editar' }))
     await waitFor(() => expect(window.location.pathname).toBe('/Sistema-Girassol/familias/1/editar'))
     expect(await screen.findByRole('heading', { name: 'Editar família' })).toBeInTheDocument()
@@ -149,11 +138,9 @@ describe('CRUD de família ponta-a-ponta (#51)', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Nome' }), { target: { value: 'Família Teste E2E Atualizada' } })
     fireEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }))
 
-    // 5. PUT disparado e navegação de volta ao detalhe, já atualizado.
     await waitFor(() => expect(window.location.pathname).toBe('/Sistema-Girassol/familias/1'))
     expect(await screen.findByRole('heading', { name: 'Família Teste E2E Atualizada' })).toBeInTheDocument()
 
-    // 6. Excluir com confirmação, DELETE e volta à listagem, agora vazia de novo.
     fireEvent.click(screen.getByRole('button', { name: 'Excluir' }))
     const dialog = await screen.findByRole('dialog')
     fireEvent.click(within(dialog).getByRole('button', { name: 'Excluir' }))

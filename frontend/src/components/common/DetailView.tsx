@@ -33,7 +33,6 @@ interface DetailViewProps<T> {
   /** Conteúdo extra (ações, hub, etc.) renderizado só quando o item carrega. */
   renderActions?: (item: T) => ReactNode
 
-  // Overrides dos estados compartilhados (#27).
   loadingState?: ReactNode
   /** Mostrado apenas no 404 (registro não encontrado), não em outros erros. */
   emptyState?: ReactNode
@@ -42,9 +41,7 @@ interface DetailViewProps<T> {
 
 /**
  * Exibição genérica (read-only) de uma entidade carregada por id, configurável
- * por `fields` — espelha o PaginatedList (#23) para a tela de Detalhes (#24).
- * Consome o GET `/{recurso}/{id}` (base da #29) e os estados da #27; o 404 no
- * formato ApiError vira "registro não encontrado".
+ * por `fields`. O 404 no formato ApiError vira "registro não encontrado".
  *
  * loading/item/error são DERIVADOS de uma request key (`endpoint/id#refresh`),
  * então trocar `id`/`endpoint` com o componente montado reseta na hora (sem

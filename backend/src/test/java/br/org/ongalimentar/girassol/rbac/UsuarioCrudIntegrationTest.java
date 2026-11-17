@@ -22,11 +22,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import br.org.ongalimentar.girassol.TestcontainersConfiguration;
 
-/**
- * Valida o CRUD de {@code /api/usuarios} (administração RBAC, #3): ciclo completo
- * com vínculo de cargos, hashing da senha (nunca exposta), senha obrigatória na
- * criação e opcional na edição, filtro por nome/e-mail e a barreira RBAC (403).
- */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @WithMockUser(authorities = { "USUARIO:READ", "USUARIO:CREATE", "USUARIO:UPDATE", "USUARIO:DELETE" })

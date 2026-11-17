@@ -33,8 +33,6 @@ class DataSeederTest {
 
 	@Test
 	void seedPopulaCatalogoCargosEAdmin() {
-		// Catálogo completo (espelha frontend/src/auth/permissions.ts).
-		// 38 de domínio + 9 de administração RBAC (USUARIO:*, CARGO:*, PERMISSAO:READ — #3).
 		assertEquals(47, permissaoRepository.count());
 
 		assertTrue(cargoRepository.findByNome("ADMINISTRADOR").isPresent());

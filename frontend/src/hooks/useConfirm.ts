@@ -7,7 +7,6 @@ export function useConfirm() {
   const resolverRef = useRef<((value: boolean) => void) | null>(null);
 
   const confirm = useCallback((dialogOptions: ConfirmDialogOptions): Promise<boolean> => {
-    // Se já houver uma confirmação pendente, resolve a anterior como falsa antes de abrir a nova
     if (resolverRef.current) {
       resolverRef.current(false);
     }

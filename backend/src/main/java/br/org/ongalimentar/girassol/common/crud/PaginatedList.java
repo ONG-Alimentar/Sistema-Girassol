@@ -5,11 +5,6 @@ import java.util.function.Function;
 
 import org.springframework.data.domain.Page;
 
-/**
- * Resposta paginada genérica — o contrato que a Tabela do front (#23) consome.
- * Expõe os dados ({@code content}) e os metadados de paginação de forma estável,
- * sem acoplar o front à serialização padrão do {@code Page} do Spring Data.
- */
 public record PaginatedList<T>(
 		List<T> content,
 		int page,

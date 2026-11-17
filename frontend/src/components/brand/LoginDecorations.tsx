@@ -22,7 +22,6 @@ export function LoginDecorations() {
         zIndex: 0,
       }}
     >
-      {/* Pétalas no canto inferior-direito (metade visível, como no wireframe) */}
       <Box
         component="svg"
         viewBox="0 0 160 160"
@@ -46,7 +45,6 @@ export function LoginDecorations() {
         </g>
       </Box>
 
-      {/* Colina marrom na base, ocupando toda a largura */}
       <Box
         component="svg"
         viewBox="0 0 1440 220"

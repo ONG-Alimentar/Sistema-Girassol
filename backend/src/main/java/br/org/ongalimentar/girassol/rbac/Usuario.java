@@ -13,15 +13,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
-/**
- * Pessoa autenticável no sistema (assistente social, voluntário interno,
- * profissional, administrador). Recebe {@link Cargo}s, que agrupam as permissões
- * efetivas do usuário.
- *
- * <p>É o <b>dono</b> da relação N:N com {@code Cargo} (tabela {@code usuario_cargo}).
- * A senha é armazenada <b>sempre hasheada</b> (BCrypt); nunca em texto puro — ver
- * {@code PasswordEncoderConfig}.
- */
 @Entity
 @Table(name = "usuario")
 public class Usuario {

@@ -5,11 +5,6 @@ import java.util.List;
 
 import br.org.ongalimentar.girassol.rbac.Usuario;
 
-/**
- * DTO de saída de {@link Usuario} para a administração (#3). Nunca expõe o hash
- * da senha. Os cargos devem estar inicializados pelo service antes da conversão
- * ({@code open-in-view=false}).
- */
 public record UsuarioAdminResponse(Long id, String nome, String email, boolean ativo, List<CargoResumo> cargos) {
 
 	/** Resumo do cargo para listar/exibir no usuário (sem as permissões). */

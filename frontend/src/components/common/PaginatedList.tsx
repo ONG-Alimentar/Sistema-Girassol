@@ -64,7 +64,6 @@ interface PaginatedListProps<T> {
   onItemClick?: (item: T) => void
   renderCard?: (item: T) => ReactNode
 
-  // Pontos de integração com os componentes compartilhados da #27.
   loadingState?: ReactNode
   emptyState?: ReactNode
   errorState?: (error: Error, retry: () => void) => ReactNode
@@ -139,7 +138,6 @@ export function PaginatedList<T>({
           }
         })
 
-        // Paginação e ordenação pertencem ao estado do componente.
         params.set('page', String(page))
         params.set('size', String(size))
         params.delete('sort')

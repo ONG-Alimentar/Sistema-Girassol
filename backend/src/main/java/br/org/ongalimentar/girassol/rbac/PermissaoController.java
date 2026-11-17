@@ -13,12 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import br.org.ongalimentar.girassol.common.crud.PaginatedList;
 import br.org.ongalimentar.girassol.rbac.dto.PermissaoResponse;
 
-/**
- * API <b>somente-leitura</b> do catálogo de {@link Permissao} (administração, #3):
- * {@code GET /} (paginado/ordenado/filtrado por {@code ?q=}) e {@code GET /{id}}.
- * Não há escrita por design — ver {@link PermissaoService}. Autorização RBAC
- * ({@code PERMISSAO:READ}) fica no service.
- */
 @RestController
 @RequestMapping("/api/permissoes")
 public class PermissaoController {

@@ -16,12 +16,6 @@ import br.org.ongalimentar.girassol.common.error.FieldValidationException;
 import br.org.ongalimentar.girassol.rbac.dto.UsuarioAdminRequest;
 import br.org.ongalimentar.girassol.rbac.dto.UsuarioAdminResponse;
 
-/**
- * CRUD REST de {@link Usuario} (administração, #3) sobre a base genérica
- * ({@link CrudController}). O específico é o mapeamento DTO↔entidade — hashing
- * BCrypt da senha e resolução dos {@code cargoIds} — e o filtro {@code ?q=} por
- * nome/e-mail. Autorização RBAC fica no {@link UsuarioService}.
- */
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController extends CrudController<Usuario, Long, UsuarioAdminRequest, UsuarioAdminResponse> {

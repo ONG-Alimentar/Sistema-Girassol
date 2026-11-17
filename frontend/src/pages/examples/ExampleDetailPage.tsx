@@ -9,7 +9,6 @@ const fields: DetailField<ExampleListItem>[] = [
   { field: 'date', label: 'Data', render: (value) => String(value).split('-').reverse().join('/') },
 ]
 
-/** Consumidor de exemplo do DetailView genérico (#24); não é a tela de domínio. */
 export function ExampleDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
