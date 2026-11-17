@@ -11,19 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.org.ongalimentar.girassol.common.crud.CrudService;
 
-/**
- * CRUD da {@link Familia} sobre a base genérica. O código específico aqui é
- * mínimo: apenas o vínculo com o repositório e os guards RBAC por operação
- * ({@code FAMILIA:*}), sobrescrevendo os métodos da base com {@code @PreAuthorize}
- * (padrão de autorização por método do {@code SecurityConfig}). Como o
- * {@code open-in-view=false}, as coleções lazy (telefones, endereços,
- * dependentes, saúde, substâncias, serviços e situação socioeconômica) são
- * inicializadas aqui, dentro da transação, para o {@code FamiliaResponse}
- * conseguir lê-las no controller — exceto em {@link #list}, que o
- * {@code FamiliaController} mapeia para uma resposta enxuta (só escalares),
- * sem tocar nas coleções: evita N×7 queries lazy por página de listagem (a
- * listagem não usa esses dados).
- */
 @Service
 public class FamiliaService extends CrudService<Familia, Long> {
 

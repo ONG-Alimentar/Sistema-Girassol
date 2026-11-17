@@ -13,17 +13,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
-/**
- * Cargo (role) do RBAC — um agrupamento de {@link Permissao}. A verificação de
- * acesso é feita pela permissão, não pelo cargo (modelo permission-based, ver
- * {@code docs/seguranca/rbac.md}).
- *
- * <p>Duas relações N:N:
- * <ul>
- *   <li><b>Cargo ↔ Permissao</b>: o Cargo é o <b>dono</b> (tabela {@code cargo_permissao}).</li>
- *   <li><b>Cargo ↔ Usuario</b>: o {@link Usuario} é o dono; aqui é o lado inverso.</li>
- * </ul>
- */
 @Entity
 @Table(name = "cargo")
 public class Cargo {

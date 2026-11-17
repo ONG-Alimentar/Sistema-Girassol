@@ -16,7 +16,6 @@ describe('DashboardPage — home por Cargo', () => {
     } })
 
     expect(await screen.findByRole('heading', { name: 'Olá, Admin!' })).toBeInTheDocument()
-    // Atalhos permitidos aparecem; "Usuários" (administração RBAC) exige USUARIO:READ.
     expect(screen.getByRole('heading', { name: 'Usuários' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Famílias' })).toBeInTheDocument()
   })

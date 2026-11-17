@@ -14,11 +14,6 @@ import br.org.ongalimentar.girassol.TestcontainersConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-/**
- * Valida o mapeamento das entidades RBAC contra um Postgres real (Testcontainers):
- * o grafo Usuario ↔ Cargo ↔ Permissao persiste e é recarregado pelas tabelas de
- * junção, e o {@link PasswordEncoder} hasheia a senha (critério da #18).
- */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @Transactional

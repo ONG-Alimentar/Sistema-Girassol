@@ -11,12 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.org.ongalimentar.girassol.common.crud.CrudService;
 
-/**
- * CRUD do {@link Cargo} sobre a base genérica, com guards {@code CARGO:*}. Como o
- * {@code open-in-view=false}, as coleções lazy ({@code permissoes}, {@code usuarios})
- * são inicializadas aqui, dentro da transação, para o mapeamento do DTO conseguir
- * lê-las no controller.
- */
 @Service
 public class CargoService extends CrudService<Cargo, Long> {
 

@@ -15,7 +15,6 @@ export interface TestUser {
   cargos?: string[]
 }
 
-/** Monta uma Response JSON para stubs de fetch. */
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -38,8 +37,8 @@ interface RenderAuthedOptions {
 /**
  * Renderiza o App no subpath de produção com a sessão já resolvida. Stuba
  * import.meta.env.BASE_URL e o fetch global (/api/auth/me + delegação ao
- * fetchHandler). Lembre de limpar no afterEach: cleanup() + vi.unstubAllGlobals()
- * + vi.unstubAllEnvs().
+ * fetchHandler). O chamador deve limpar no afterEach: cleanup() +
+ * vi.unstubAllGlobals() + vi.unstubAllEnvs().
  */
 export async function renderAuthedApp({
   me,

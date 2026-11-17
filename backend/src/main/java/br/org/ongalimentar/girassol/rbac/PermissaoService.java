@@ -9,13 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.org.ongalimentar.girassol.common.error.ResourceNotFoundException;
 
-/**
- * Consulta do catálogo de {@link Permissao}. O catálogo é <b>somente-leitura</b>
- * pela API: ele é acoplado ao código (as permissões são referenciadas por string
- * nos {@code @PreAuthorize}), então criar/renomear/excluir por fora quebraria a
- * autorização silenciosamente. A manutenção fica a cargo do seed ({@code DataSeeder}).
- * Leitura guardada por {@code PERMISSAO:READ}.
- */
 @Service
 public class PermissaoService {
 

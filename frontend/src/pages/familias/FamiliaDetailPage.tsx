@@ -15,11 +15,6 @@ import { MODULES } from '../../navigation/modules'
 import { getServicos } from '../../features/familias/servicoApi'
 import type { EnderecoRequest, FamiliaResponse, ServicoResponse } from '../../features/familias/types'
 
-/**
- * Família (campos escalares + coleções do FamiliaResponse, consolidado com o
- * shape usado pelo formulário de edição do #4 — ver features/familias/types).
- * As coleções são só leitura aqui — a edição delas é do módulo #4.
- */
 type Familia = FamiliaResponse
 
 const GENERO_LABELS: Record<string, string> = {
@@ -70,10 +65,6 @@ function simNao(value: boolean | null): string {
   return value == null ? '—' : value ? 'Sim' : 'Não'
 }
 
-// Ordem e agrupamento dos "Dados pessoais" fiéis ao wireframe (docs/wireframes,
-// telas 30-33): nome, filiação/nascimento, documentos, contato — seguidos dos
-// campos que o wireframe não previa (indicação/cadastro). Telefone e Endereço
-// (listas) são renderizados à parte, uma linha por item, entre NIS e Email.
 const personalFieldsBeforeContact: DetailField<Familia>[] = [
   { field: 'nome', label: 'Nome completo' },
   { field: 'nomeSocial', label: 'Nome social' },
@@ -96,10 +87,6 @@ const personalFieldsAfterContact: DetailField<Familia>[] = [
 // registro — famílias/documentação/usuários — não é serviço de família).
 const FAMILY_SERVICE_PATHS = ['cestas', 'roupas', 'visitas', 'juridico', 'psicologico']
 
-/**
- * Detalhe-hub da família (#50): dados read-only (via DetailView/#24), hub de
- * navegação para os serviços da família e ações Editar/Excluir (RBAC + #27).
- */
 export function FamiliaDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -368,7 +355,7 @@ export function FamiliaDetailPage() {
                     <Button
                       variant="text"
                       startIcon={<EditOutlinedIcon />}
-                      onClick={() => showToast('A edição de famílias chega no #51.', 'info')}
+                      onClick={() => navigate(`/familias/${familia.id}/editar`)}
                       sx={{ fontWeight: 700 }}
                     >
                       Editar

@@ -62,7 +62,6 @@ export function LoginPage() {
     >
       <LoginDecorations />
       <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 400 }}>
-        {/* Marca */}
         <Box
           sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, mb: 4 }}
         >
@@ -75,7 +74,6 @@ export function LoginPage() {
           </Typography>
         </Box>
 
-        {/* Formulário */}
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField

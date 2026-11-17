@@ -1,10 +1,6 @@
 import { Button, Container, Stack, Typography } from '@mui/material'
 import { Link, useParams } from 'react-router-dom'
 
-/**
- * Stub de edição (dev) só para provar a navegação Detalhes → Edição da #24.
- * A tela de edição real (formulário unificado) é do #26/#51.
- */
 export function ExampleEditPage() {
   const { id } = useParams()
   return (

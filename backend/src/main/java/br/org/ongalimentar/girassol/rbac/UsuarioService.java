@@ -13,17 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.org.ongalimentar.girassol.common.crud.CrudService;
 
-/**
- * CRUD de {@link Usuario} sobre a base genérica, com guards {@code USUARIO:*}.
- *
- * <p>Como o {@code open-in-view=false}, a coleção lazy {@code cargos} é inicializada
- * aqui, dentro da transação, para o mapeamento do DTO conseguir lê-la no controller.
- *
- * <p>Também protege o invariante "deve restar ao menos um administrador ativo":
- * nenhuma exclusão/edição pode deixar o sistema sem um usuário ativo capaz de gerir
- * usuários ({@link #PERMISSAO_ADMIN}). A verificação roda <b>após</b> a alteração,
- * dentro da mesma transação, e lança para forçar rollback.
- */
 @Service
 public class UsuarioService extends CrudService<Usuario, Long> {
 

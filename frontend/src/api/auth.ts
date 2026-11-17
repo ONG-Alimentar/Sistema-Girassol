@@ -1,5 +1,3 @@
-// Endpoints de autenticação. Contrato mínimo enquanto o mecanismo definitivo
-// (sessão × JWT) não é fechado no backend — ver docs/seguranca/rbac.md.
 import type { Permission } from '../auth/permissions.ts'
 import { ApiError, apiFetch } from './client.ts'
 
@@ -18,12 +16,10 @@ export interface Usuario {
   cargos?: string[]
 }
 
-/** Autentica o usuário. */
 export function login(credenciais: Credenciais): Promise<Usuario> {
   return apiFetch<Usuario>('/api/auth/login', { method: 'POST', body: credenciais })
 }
 
-/** Encerra a sessão atual no backend. */
 export function logout(): Promise<unknown> {
   return apiFetch('/api/auth/logout', { method: 'POST' })
 }

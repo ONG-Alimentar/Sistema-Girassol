@@ -54,11 +54,6 @@ public class FamiliaController extends CrudController<Familia, Long, FamiliaRequ
 		return service;
 	}
 
-	/**
-	 * Sobrescreve a listagem genérica para mapear com {@link FamiliaResponse#paraListagem}
-	 * em vez de {@link #toResponse} — a listagem não usa as coleções da família
-	 * (telefones, dependentes, saúde, etc.), então evita inicializá-las por linha.
-	 */
 	@Override
 	@GetMapping
 	public PaginatedList<FamiliaResponse> listar(@RequestParam(required = false) Map<String, String> params, Pageable pageable) {

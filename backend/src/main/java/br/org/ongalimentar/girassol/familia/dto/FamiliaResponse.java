@@ -12,13 +12,6 @@ import br.org.ongalimentar.girassol.familia.Indicacao;
 import br.org.ongalimentar.girassol.familia.Servico;
 import br.org.ongalimentar.girassol.familia.SituacaoSocioeconomica;
 
-/**
- * DTO de saída da {@link Familia}: campos escalares do cadastro mais as coleções
- * (telefones, endereços, dependentes, situação socioeconômica, saúde, serviços),
- * reaproveitando os DTOs por entidade (#51) tanto para a tela de detalhe (#50,
- * só leitura) quanto para o formulário de edição. As coleções devem estar
- * inicializadas pelo service antes da conversão ({@code open-in-view=false}).
- */
 public record FamiliaResponse(
 		Long id,
 		String nome,
@@ -44,11 +37,6 @@ public record FamiliaResponse(
 		SituacaoSocioeconomicaResponse situacaoSocioeconomica,
 		Set<Long> servicosIds) {
 
-	/**
-	 * Versão enxuta para a listagem paginada ({@code GET /api/familias}): só os
-	 * campos escalares, sem tocar nenhuma coleção lazy — a listagem (#23) não usa
-	 * esses dados, e inicializá-los por linha custaria N×7 queries extras por página.
-	 */
 	public static FamiliaResponse paraListagem(Familia f) {
 		return new FamiliaResponse(
 				f.getId(),

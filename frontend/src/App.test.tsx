@@ -4,26 +4,14 @@ import { App } from './App.tsx'
 
 /**
  * Guarda de regressão do roteamento em produção (GitHub Pages, subpath
- * /Sistema-Girassol/). Dois bugs faziam o app em prod cair sempre na
- * NotFoundPage e nunca chamar o backend:
- *
- *  1. BrowserRouter sem basename → nenhuma rota casava com /Sistema-Girassol/...
- *  2. AuthProvider não montado → useAuth() quebrava (e a API sumia por
- *     tree-shaking).
- *
- * Aqui o App roda com basename = import.meta.env.BASE_URL, que o vitest.config
- * fixa em '/Sistema-Girassol/' (igual ao build de prod). Se qualquer um dos dois
- * bugs voltar, estes testes falham: rota sem basename → NotFoundPage; sem
- * AuthProvider → useAuth() lança ao renderizar a tela de login.
+ * /Sistema-Girassol/): BrowserRouter sem basename ou AuthProvider não montado
+ * faziam o app cair sempre na NotFoundPage e nunca chamar o backend. Roda com
+ * basename = import.meta.env.BASE_URL, fixado em '/Sistema-Girassol/' pelo
+ * vitest.config (igual ao build de prod).
  */
 describe('App — roteamento no subpath de produção', () => {
   beforeEach(() => {
-    // Reproduz o subpath do build de produção (GitHub Pages). O App usa
-    // basename={import.meta.env.BASE_URL}; sem o basename certo, nenhuma rota
-    // casaria e tudo cairia na NotFoundPage — exatamente o bug sob guarda.
     vi.stubEnv('BASE_URL', '/Sistema-Girassol/')
-    // AuthProvider chama /api/auth/me no mount; sem sessão, a chamada falha e o
-    // usuário fica deslogado (→ redireciona para /login).
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('sem rede no teste')))
   })
 
@@ -46,8 +34,6 @@ describe('App — roteamento no subpath de produção', () => {
 
     render(<App />)
 
-    // Sem sessão, RequireAuth manda para /login — prova de que a raiz casa uma
-    // rota (o bug do basename fazia cair no fallback '* → /404').
     expect(await screen.findByRole('button', { name: /entrar/i })).toBeInTheDocument()
     expect(screen.queryByText(/Página não encontrada/i)).not.toBeInTheDocument()
   })

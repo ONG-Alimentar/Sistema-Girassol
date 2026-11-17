@@ -20,11 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.org.ongalimentar.girassol.common.crud.PaginatedList;
 
-/**
- * Demonstração da listagem genérica (#23) sobre dados fictícios. Restrito ao
- * profile {@code dev} — é scaffolding de desenvolvimento e não deve ir ao ar em
- * produção, espelhando as rotas de exemplo do frontend (gated por DEV).
- */
 @RestController
 @RequestMapping("/api/examples/listagem")
 @Profile("dev")

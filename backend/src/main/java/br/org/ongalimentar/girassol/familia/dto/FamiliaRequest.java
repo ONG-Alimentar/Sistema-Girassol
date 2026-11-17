@@ -12,12 +12,6 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import jakarta.validation.Valid;
 
-/**
- * DTO de entrada (create/update) da {@link br.org.ongalimentar.girassol.familia.Familia}.
- * Cobre os campos escalares do cadastro — as coleções (telefones, endereços,
- * dependentes, situação socioeconômica, saúde, serviços) ficam para o módulo
- * Famílias (#4).
- */
 public record FamiliaRequest(
 		@NotBlank(message = "O nome é obrigatório.") String nome,
 		String nomeSocial,

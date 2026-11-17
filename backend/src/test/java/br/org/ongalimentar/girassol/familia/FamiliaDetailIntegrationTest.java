@@ -25,14 +25,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import br.org.ongalimentar.girassol.TestcontainersConfiguration;
 
-/**
- * Valida que {@code GET /api/familias/{id}} e {@code GET /api/familias} expõem as
- * coleções da família (telefones, endereços, dependentes, situação
- * socioeconômica, saúde, serviços) sem {@code LazyInitializationException}
- * ({@code open-in-view=false}, resolvido no {@link FamiliaService}), e que a
- * listagem paginada usa a resposta enxuta ({@link FamiliaService} não inicializa
- * as coleções nela — evita N×7 queries por página).
- */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
 @WithMockUser(authorities = { "FAMILIA:READ", "FAMILIA:CREATE", "FAMILIA:UPDATE" })
@@ -53,13 +45,6 @@ class FamiliaDetailIntegrationTest {
 		mvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 	}
 
-	/**
-	 * Limpa também depois do último teste da classe: diferente de
-	 * {@link br.org.ongalimentar.girassol.FamiliaPersistenceTests} (que é
-	 * {@code @Transactional} e sofre rollback automático), este teste usa MockMvc
-	 * (commits reais) — sem isso, o {@code Servico} criado aqui vazaria pro banco
-	 * compartilhado do Testcontainers e colidiria (nome único) com outras classes.
-	 */
 	@AfterEach
 	void tearDown() {
 		limparRepositorios();
