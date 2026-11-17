@@ -19,13 +19,57 @@ const familia = {
   naturalidade: 'Pelotas',
   observacoes: 'Sem observações.',
   dataCadastro: '2026-01-02',
+  telefones: ['53999990000'],
+  enderecos: [{ rua: 'Rua das Flores', bairro: 'Centro', numero: '42', complemento: 'Casa 2', cidade: 'Pelotas', cep: '96015000' }],
+  dependentes: [{ nome: 'João Silva', dataNascimento: '2012-08-03', parentesco: 'Filho', ocupacao: 'Estudante' }],
+  situacaoSocioeconomica: {
+    profissao: 'Costureira',
+    escolaridade: 'Ensino médio',
+    tipoMoradia: 'ALUGADA',
+    renda: 'ATE_1_SALARIO_MINIMO',
+    beneficio: 'Bolsa Família',
+    acessoAlimentacao: true,
+  },
+  problemasSaude: [{ descricao: 'Asma', gravidade: 'Moderada' }],
+  medicamentos: [{ descricao: 'Salbutamol', dosagem: '2 jatos' }],
+  substancias: ['Tabaco'],
+  servicos: ['Cesta básica'],
 }
 
-/** Trata GET/DELETE de /api/familias/7; outros ids → 404. */
+const familiaVazia = {
+  id: 8,
+  nome: 'Família sem dados complementares',
+  nomeSocial: null,
+  dataNascimento: null,
+  genero: null,
+  estadoCivil: null,
+  indicacao: null,
+  nomeMae: null,
+  email: null,
+  cpf: null,
+  rg: null,
+  nis: null,
+  naturalidade: null,
+  observacoes: null,
+  dataCadastro: null,
+  telefones: [],
+  enderecos: [],
+  dependentes: [],
+  situacaoSocioeconomica: null,
+  problemasSaude: [],
+  medicamentos: [],
+  substancias: [],
+  servicos: [],
+}
+
+/** Trata GET/DELETE de /api/familias/7 e /8; outros ids → 404. */
 function familiaHandler(url: string, init?: RequestInit): Response {
   if (url.endsWith('/api/familias/7')) {
     if (init?.method === 'DELETE') return new Response(null, { status: 204 })
     return jsonResponse(familia)
+  }
+  if (url.endsWith('/api/familias/8')) {
+    return jsonResponse(familiaVazia)
   }
   return jsonResponse({ message: 'Família não encontrada.' }, 404)
 }
@@ -44,7 +88,8 @@ describe('FamiliaDetailPage — detalhe-hub (#50)', () => {
   it('exibe os dados da família (enums e datas formatados)', async () => {
     await open(['FAMILIA:READ'])
 
-    expect(await screen.findByText('Família Silva')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Família Silva' })).toBeInTheDocument()
+    expect(screen.getByText('Dados pessoais')).toBeInTheDocument()
     expect(screen.getByText('Feminino')).toBeInTheDocument()
     expect(screen.getByText('União estável')).toBeInTheDocument()
     expect(screen.getByText('10/05/1990')).toBeInTheDocument()
@@ -59,16 +104,16 @@ describe('FamiliaDetailPage — detalhe-hub (#50)', () => {
   it('oculta Editar/Excluir e o hub sem as permissões (só FAMILIA:READ)', async () => {
     await open(['FAMILIA:READ'])
 
-    await screen.findByText('Família Silva')
+    await screen.findByRole('heading', { name: 'Família Silva' })
     expect(screen.queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Excluir' })).not.toBeInTheDocument()
-    expect(screen.queryByText('Serviços da família')).not.toBeInTheDocument()
+    expect(screen.queryByText('Gerenciar cestas básicas')).not.toBeInTheDocument()
   })
 
   it('mostra o card de serviço permitido e navega com ?familia=:id', async () => {
     await open(['FAMILIA:READ', 'CESTA:READ'])
 
-    fireEvent.click(await screen.findByText('Cestas básicas'))
+    fireEvent.click(await screen.findByText('Gerenciar cestas básicas'))
 
     await waitFor(() => expect(window.location.pathname).toBe('/Sistema-Girassol/cestas'))
     expect(window.location.search).toBe('?familia=7')
@@ -95,5 +140,55 @@ describe('FamiliaDetailPage — detalhe-hub (#50)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Editar' }))
 
     expect(await screen.findByText(/edição de famílias chega no #51/i)).toBeInTheDocument()
+  })
+
+  it('exibe Telefone e Endereço no card Dados pessoais', async () => {
+    await open(['FAMILIA:READ'])
+
+    expect(await screen.findByText(/53999990000/)).toBeInTheDocument()
+    expect(screen.getByText(/Rua das Flores/)).toBeInTheDocument()
+  })
+
+  it('exibe a seção Dependentes', async () => {
+    await open(['FAMILIA:READ'])
+
+    expect(await screen.findByText('Dependentes')).toBeInTheDocument()
+    expect(screen.getByText(/João Silva/)).toBeInTheDocument()
+    expect(screen.getByText(/Estudante/)).toBeInTheDocument()
+  })
+
+  it('exibe a seção Situação socioeconômica com os labels traduzidos', async () => {
+    await open(['FAMILIA:READ'])
+
+    expect(await screen.findByText('Situação socioeconômica')).toBeInTheDocument()
+    expect(screen.getByText('Alugada')).toBeInTheDocument()
+    expect(screen.getByText('Até 1 salário mínimo')).toBeInTheDocument()
+    expect(screen.getByText(/Sim/)).toBeInTheDocument()
+  })
+
+  it('exibe a seção Saúde (problemas, medicamentos e substâncias)', async () => {
+    await open(['FAMILIA:READ'])
+
+    expect(await screen.findByText('Saúde')).toBeInTheDocument()
+    expect(screen.getByText(/Gravidade: Moderada/)).toBeInTheDocument()
+    expect(screen.getByText(/Dosagem: 2 jatos/)).toBeInTheDocument()
+    expect(screen.getByText('Tabaco')).toBeInTheDocument()
+  })
+
+  it('exibe a seção Serviços utilizados', async () => {
+    await open(['FAMILIA:READ'])
+
+    expect(await screen.findByText('Serviços utilizados')).toBeInTheDocument()
+    expect(screen.getByText('Cesta básica')).toBeInTheDocument()
+  })
+
+  it('oculta as seções novas quando a família não tem dados complementares', async () => {
+    await open(['FAMILIA:READ'], '/familias/8')
+
+    await screen.findByRole('heading', { name: 'Família sem dados complementares' })
+    expect(screen.queryByText('Dependentes')).not.toBeInTheDocument()
+    expect(screen.queryByText('Situação socioeconômica')).not.toBeInTheDocument()
+    expect(screen.queryByText('Saúde')).not.toBeInTheDocument()
+    expect(screen.queryByText('Serviços utilizados')).not.toBeInTheDocument()
   })
 })
