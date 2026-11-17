@@ -16,6 +16,7 @@ import { CargoDetailPage } from './pages/admin/CargoDetailPage'
 import { PermissaoDetailPage } from './pages/admin/PermissaoDetailPage'
 import { FamiliaDetailPage } from './pages/familias/FamiliaDetailPage.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
+import { FamiliaFormPage } from './pages/FamiliaFormPage';
 
 // Exemplos carregados apenas em desenvolvimento, sem entrar no menu de produção.
 const ExampleListPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleListPage').then((module) => ({ default: module.ExampleListPage }))) : () => null
@@ -40,6 +41,19 @@ const ADMIN_DETAIL_ROUTES: { path: string; permission: Permission; element: Reac
 export function AppRoutes() {
   return (
     <Routes>
+
+      // tirar depois
+
+      {import.meta.env.DEV && (
+      <Route
+        path="/teste-familia"
+        element={
+          <FamiliaFormPage />
+        }
+      />
+    )}
+    // tirar depois
+
       {/* Pública */}
       <Route path="/login" element={<LoginPage />} />
 
@@ -89,8 +103,30 @@ export function AppRoutes() {
               }
             />
           ))}
+          /*
+          <Route
+            path="familias/nova"
+            element={
+              <PermissionGuard permission="FAMILIA:CREATE" redirect>
+                <FamiliaFormPage />
+              </PermissionGuard>
+            }
+          />
+
+          <Route
+            path="familias/:id/editar"
+            element={
+              <PermissionGuard permission="FAMILIA:UPDATE" redirect>
+                <FamiliaFormPage />
+              </PermissionGuard>
+            }
+          />  
+          */
+          
           <Route path="403" element={<ForbiddenPage />} />
+
         </Route>
+
       </Route>
 
       {/* Fallbacks */}
