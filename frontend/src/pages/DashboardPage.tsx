@@ -4,11 +4,6 @@ import { useAuth } from '../auth/useAuth.ts'
 import { cargoLabel } from '../auth/cargo.ts'
 import { MODULES } from '../navigation/modules.ts'
 
-/**
- * Home do app autenticado (wireframes HomeAdmin/Assistente/Voluntário/...):
- * saudação por Cargo + grade de cards de atalho condicionada às permissões.
- * Só atalhos — sem dashboards/gráficos.
- */
 export function DashboardPage() {
   const { user, can } = useAuth()
   const navigate = useNavigate()

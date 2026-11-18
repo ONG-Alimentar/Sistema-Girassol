@@ -15,7 +15,6 @@ public record PaginatedList<T>(
 		boolean last,
 		String sort) {
 
-	/** Converte um {@link Page} de entidades em {@code PaginatedList} de DTOs. */
 	public static <E, D> PaginatedList<D> from(Page<E> page, Function<E, D> mapper) {
 		List<D> content = page.getContent().stream().map(mapper).toList();
 		return new PaginatedList<>(

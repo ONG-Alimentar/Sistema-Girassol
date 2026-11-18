@@ -9,7 +9,6 @@ const item = {
   date: '2026-02-15',
 }
 
-/** Respostas das rotas de exemplo (as de /api/auth/me ficam no renderAuthedApp). */
 function examplesHandler(url: string): Response {
   if (url.includes('/api/examples/listagem?')) {
     return jsonResponse({
@@ -40,7 +39,6 @@ beforeAll(async () => {
 }, 60000)
 
 beforeEach(() => {
-  // As rotas de exemplo só existem em DEV; o renderAuthedApp cuida do BASE_URL.
   vi.stubEnv('DEV', true)
 })
 

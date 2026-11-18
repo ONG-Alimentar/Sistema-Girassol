@@ -1,11 +1,5 @@
 import { Box } from '@mui/material'
 
-/**
- * Camada decorativa do fundo da tela de login (wireframe Login.png): pétalas de
- * girassol surgindo no canto inferior-direito + uma "colina" marrom na base.
- * Puramente estética — fica atrás do conteúdo (zIndex 0), não captura cliques e
- * é escondida de leitores de tela.
- */
 const PETAL = '#F2B705'
 const PETAL_EDGE = '#E0A100'
 const BROWN = '#5B3A21'

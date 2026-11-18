@@ -18,7 +18,6 @@ import { FamiliaDetailPage } from './pages/familias/FamiliaDetailPage.tsx'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { FamiliaFormPage } from './pages/FamiliaFormPage';
 
-// Exemplos carregados apenas em desenvolvimento, sem entrar no menu de produção.
 const ExampleListPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleListPage').then((module) => ({ default: module.ExampleListPage }))) : () => null
 const ExampleDetailPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleDetailPage').then((module) => ({ default: module.ExampleDetailPage }))) : () => null
 const ExampleEditPage = import.meta.env.DEV ? lazy(() => import('./pages/examples/ExampleEditPage').then((module) => ({ default: module.ExampleEditPage }))) : () => null
@@ -32,10 +31,7 @@ const ADMIN_DETAIL_ROUTES: { path: string; permission: Permission; element: Reac
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Pública */}
       <Route path="/login" element={<LoginPage />} />
-
-      {/* Autenticadas: RequireAuth protege todo o grupo */}
       <Route element={<RequireAuth />}>
         {import.meta.env.DEV && (
           <>
@@ -101,7 +97,6 @@ export function AppRoutes() {
 
       </Route>
 
-      {/* Fallbacks */}
       <Route path="/404" element={<NotFoundPage />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>

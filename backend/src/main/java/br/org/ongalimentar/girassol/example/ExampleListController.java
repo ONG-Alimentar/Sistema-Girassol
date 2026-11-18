@@ -74,7 +74,6 @@ public class ExampleListController {
 		return PaginatedList.from(page, Function.identity());
 	}
 
-	/** Leitura do fixture para demonstrar a navegação da listagem, sem CRUD de domínio. */
 	@GetMapping("/{id}")
 	public ExampleListItem detail(@PathVariable Long id) {
 		return ITEMS.stream()

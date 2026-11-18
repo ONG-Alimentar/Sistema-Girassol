@@ -33,8 +33,6 @@ import { LoadingState } from './LoadingState'
 import { EmptyState } from './EmptyState'
 import { ErrorState } from './ErrorState'
 
-// Filtros de texto aguardam a digitação parar antes de consultar o servidor;
-// os de data, por serem discretos, são aplicados na hora.
 const TEXT_FILTER_DEBOUNCE_MS = 300
 
 export interface ListColumn<T> {
@@ -46,7 +44,6 @@ export interface ListColumn<T> {
 
 export interface ListFilter {
   label: string
-  // page, size e sort são reservados ao componente.
   param: string
   type: 'text' | 'date'
   placeholder?: string
@@ -93,8 +90,6 @@ export function PaginatedList<T>({
   const [size, setSize] = useState(initialPageSize)
   const [sortField, setSortField] = useState('')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-  // filterValues: o que o campo exibe (imediato). appliedFilters: o que vai à
-  // consulta (texto entra com debounce, data imediatamente).
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({})
   const [refresh, setRefresh] = useState(0)
@@ -103,7 +98,6 @@ export function PaginatedList<T>({
 
   useEffect(() => () => clearTimeout(debounceRef.current), [])
 
-  // Inclui o tamanho inicial mesmo se ele não estiver nas opções recebidas.
   const availablePageSizes = Array.from(
     new Set([...pageSizeOptions, size]),
   ).sort((a, b) => a - b)
@@ -153,7 +147,6 @@ export function PaginatedList<T>({
 
         if (controller.signal.aborted) return
 
-        // Recupera a navegação se a quantidade de páginas diminuir.
         const lastPage = Math.max(result.totalPages - 1, 0)
 
         if (page > lastPage) {

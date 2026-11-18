@@ -65,7 +65,6 @@ const familiaVazia = {
   servicosIds: [],
 }
 
-/** Trata GET/DELETE de /api/familias/7 e /8, e o catálogo de /api/servicos; outros ids → 404. */
 function familiaHandler(url: string, init?: RequestInit): Response {
   if (url.endsWith('/api/servicos')) {
     return jsonResponse(servicosCatalogo)

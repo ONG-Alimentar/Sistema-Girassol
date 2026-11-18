@@ -6,47 +6,27 @@ import { LoadingState } from './LoadingState'
 import { EmptyState } from './EmptyState'
 import { ErrorState } from './ErrorState'
 
-// Só ids inteiros positivos são válidos; qualquer outra coisa é tratada como
-// "não encontrado" sem consultar o servidor (espelha o ExampleDetailPage).
 const VALID_ID = /^[1-9]\d*$/
 
 export interface DetailField<T> {
   label: string
   field: keyof T
-  /**
-   * Formata o valor do campo. Sem `render`, usa `String(value)` (— quando nulo),
-   * então os campos devem ser escalares; use `render` para datas/objetos/JSX.
-   */
   render?: (value: T[keyof T], item: T) => ReactNode
 }
 
 interface DetailViewProps<T> {
-  /** Base do recurso; o id é anexado como `${endpoint}/${id}`. */
   endpoint: string
-  /** Id vindo da rota (useParams); undefined/ inválido → não encontrado. */
   id: string | undefined
-  /** Campos a exibir (read-only), na ordem. */
   fields: DetailField<T>[]
-  /** Ação "Editar": recebe o item carregado. Botão oculto quando ausente. */
   onEdit?: (item: T) => void
   editLabel?: string
-  /** Conteúdo extra (ações, hub, etc.) renderizado só quando o item carrega. */
   renderActions?: (item: T) => ReactNode
 
   loadingState?: ReactNode
-  /** Mostrado apenas no 404 (registro não encontrado), não em outros erros. */
   emptyState?: ReactNode
   errorState?: (error: Error, retry: () => void) => ReactNode
 }
 
-/**
- * Exibição genérica (read-only) de uma entidade carregada por id, configurável
- * por `fields`. O 404 no formato ApiError vira "registro não encontrado".
- *
- * loading/item/error são DERIVADOS de uma request key (`endpoint/id#refresh`),
- * então trocar `id`/`endpoint` com o componente montado reseta na hora (sem
- * exibir o item anterior nem perder o 404 de um id inválido).
- */
 export function DetailView<T>({
   endpoint,
   id,
@@ -69,8 +49,6 @@ export function DetailView<T>({
   const [refresh, setRefresh] = useState(0)
 
   const activeKey = `${requestKey}${refresh}`
-  // current só "resolve" quando o resultado em estado é o da requisição atual;
-  // ao trocar id/endpoint/refresh a chave muda e tudo volta a loading na hora.
   const current = result?.key === activeKey ? result : null
   const loading = validId && current === null
   const item = current?.item ?? null

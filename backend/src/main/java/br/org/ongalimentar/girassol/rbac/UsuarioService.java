@@ -16,7 +16,6 @@ import br.org.ongalimentar.girassol.common.crud.CrudService;
 @Service
 public class UsuarioService extends CrudService<Usuario, Long> {
 
-	/** Permissão que caracteriza "pode administrar o RBAC". */
 	static final String PERMISSAO_ADMIN = "USUARIO:UPDATE";
 
 	private final UsuarioRepository repository;
@@ -60,8 +59,6 @@ public class UsuarioService extends CrudService<Usuario, Long> {
 		long adminsAntes = repository.countAtivosComPermissao(PERMISSAO_ADMIN);
 		Usuario salvo = super.atualizar(id, patch);
 		salvo.getCargos().size();
-		// Desativar ou remover o cargo de administração do último admin deixaria o
-		// sistema sem quem administre — bloqueia (rollback da transação).
 		garantirAdministradorRemanescente(adminsAntes);
 		return salvo;
 	}
@@ -75,11 +72,6 @@ public class UsuarioService extends CrudService<Usuario, Long> {
 		garantirAdministradorRemanescente(adminsAntes);
 	}
 
-	/**
-	 * Bloqueia a operação se ela zerou os administradores — ou seja, só quando havia
-	 * ao menos um antes e nenhum restou. Um sistema que já estava sem admin (ex.: antes
-	 * do seed) não tem edições comuns bloqueadas.
-	 */
 	private void garantirAdministradorRemanescente(long adminsAntes) {
 		if (adminsAntes >= 1 && repository.countAtivosComPermissao(PERMISSAO_ADMIN) == 0) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT,

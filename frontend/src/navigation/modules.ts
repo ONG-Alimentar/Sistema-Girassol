@@ -18,31 +18,13 @@ import { CargosPage } from '../pages/admin/CargosPage'
 import { PermissoesPage } from '../pages/admin/PermissoesPage'
 
 export interface ModuleDef {
-  /** Segmento da rota, relativo ao layout autenticado (ex.: 'familias'). */
   path: string
-  /** Rótulo exibido no menu/drawer e nos cards da home. */
   label: string
-  /** Permissão exigida; o módulo só aparece/navega para quem a possui. */
   permission: Permission
-  /** Ícone (MUI) usado no drawer e nos cards de atalho. */
   icon: SvgIconComponent
-  /**
-   * Página real da rota. Quando ausente, a rota usa o ModulePlaceholder (módulos
-   * ainda não implementados). Telas prontas (ex.: administração RBAC) fornecem aqui.
-   */
   component?: ComponentType
 }
 
-/**
- * Fonte única dos módulos do app, consumida pelas rotas (AppRoutes),
- * pelo drawer (AppLayout) e pela grade de atalhos (DashboardPage).
- *
- * Jurídico e Psicológico ficam SEPARADOS de propósito: o RBAC isola esses
- * atendimentos (LGPD), então cada um só aparece para quem tem a permissão.
- * A administração RBAC — Usuários, Cargos e Permissões — tem página real
- * (component) e só aparece para o Administrador. PROJETO/FINANCEIRO ficam fora
- * deste menu.
- */
 export const MODULES: ModuleDef[] = [
   { path: 'familias', label: 'Famílias', permission: 'FAMILIA:READ', icon: Groups, component: FamiliasPage },
   { path: 'cestas', label: 'Cestas básicas', permission: 'CESTA:READ', icon: ShoppingBasket },

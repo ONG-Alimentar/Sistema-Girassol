@@ -16,10 +16,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import type { BaseFieldProps } from '../types';
 
-// Key por identidade do item, não por índice: ao remover um item do meio, o
-// índice faz o React reaproveitar a linha errada. onChange preserva as
-// referências dos itens não alterados, então a key fica estável. O WeakMap não
-// impede a coleta dos itens já removidos.
 const itemKeys = new WeakMap<object, number>();
 let nextItemKey = 0;
 function keyFor(item: object) {

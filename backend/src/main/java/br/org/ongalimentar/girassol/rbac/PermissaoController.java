@@ -35,7 +35,6 @@ public class PermissaoController {
 		return PermissaoResponse.from(service.buscar(id));
 	}
 
-	/** Filtro opcional {@code ?q=}: busca por código (case-insensitive). */
 	private Specification<Permissao> filtro(Map<String, String> params) {
 		String q = params.get("q");
 		if (q == null || q.isBlank()) {

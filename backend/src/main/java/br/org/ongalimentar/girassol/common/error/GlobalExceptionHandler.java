@@ -14,20 +14,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * Tradução central de exceções para o formato único {@link ApiError}, aplicada a
- * todos os endpoints. Garante respostas de erro previsíveis para o front.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	/** Recurso inexistente → 404. */
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex, HttpServletRequest req) {
 		return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);
 	}
 
-	/** Falha de Bean Validation (@Valid) → 400 com erros por campo. */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
 		List<ApiError.FieldError> campos = ex.getBindingResult().getFieldErrors().stream()
@@ -38,7 +32,6 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(body);
 	}
 
-	/** Validação condicional por campo (fora do @Valid) → 400 com erro por campo. */
 	@ExceptionHandler(FieldValidationException.class)
 	public ResponseEntity<ApiError> handleFieldValidation(FieldValidationException ex, HttpServletRequest req) {
 		ApiError body = new ApiError(Instant.now(), HttpStatus.BAD_REQUEST.value(),
@@ -47,13 +40,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(body);
 	}
 
-	/** Sem permissão (@PreAuthorize) para usuário autenticado → 403. */
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex, HttpServletRequest req) {
 		return build(HttpStatus.FORBIDDEN, "Acesso negado.", req);
 	}
 
-	/** Preserva o status/razão de exceções que já carregam um HTTP status. */
 	@ExceptionHandler(ResponseStatusException.class)
 	public ResponseEntity<ApiError> handleResponseStatus(ResponseStatusException ex, HttpServletRequest req) {
 		HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
@@ -61,14 +52,12 @@ public class GlobalExceptionHandler {
 		return build(status, message, req);
 	}
 
-	/** Violação de integridade (ex.: valor único duplicado) → 409. */
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<ApiError> handleConflict(DataIntegrityViolationException ex, HttpServletRequest req) {
 		return build(HttpStatus.CONFLICT,
 				"Violação de restrição de dados (valor duplicado ou referência inválida).", req);
 	}
 
-	/** Rede de segurança: qualquer outra exceção → 500 (sem vazar detalhes). */
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiError> handleGeneric(Exception ex, HttpServletRequest req) {
 		return build(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno.", req);

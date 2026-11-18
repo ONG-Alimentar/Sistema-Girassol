@@ -60,7 +60,6 @@ public class CargoService extends CrudService<Cargo, Long> {
 		super.excluir(id);
 	}
 
-	/** Toca as coleções lazy para materializá-las antes de a transação fechar. */
 	private static void inicializarColecoes(Cargo cargo) {
 		cargo.getPermissoes().size();
 		cargo.getUsuarios().size();

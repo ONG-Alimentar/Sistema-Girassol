@@ -34,7 +34,6 @@ public class Cargo {
 	@ManyToMany(mappedBy = "cargos")
 	private Set<Usuario> usuarios = new HashSet<>();
 
-	/** Exigido pelo JPA. */
 	protected Cargo() {
 	}
 
@@ -42,7 +41,6 @@ public class Cargo {
 		this.nome = nome;
 	}
 
-	/** Vincula uma permissão a este cargo, mantendo os dois lados da relação. */
 	public void adicionarPermissao(Permissao permissao) {
 		permissoes.add(permissao);
 		permissao.getCargos().add(this);

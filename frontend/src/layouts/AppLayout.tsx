@@ -29,13 +29,6 @@ import { MODULES } from '../navigation/modules.ts'
 
 const BOTTOM_NAV_HEIGHT = 56
 
-/**
- * Shell mobile das rotas autenticadas (wireframes BarraLateral/HomeAdmin):
- * header "Sistema Girassol" com hambúrguer, drawer lateral com os módulos
- * permitidos e bottom tab bar fixa (Início / Famílias / Mais). O conteúdo da
- * rota entra no <Outlet/>. O estilo vem do tema (src/theme.ts); os itens de
- * menu saem do registro único (navigation/modules.ts) filtrado por can().
- */
 export function AppLayout() {
   const { user, can, logout } = useAuth()
   const navigate = useNavigate()
@@ -50,8 +43,6 @@ export function AppLayout() {
     navigate('/login', { replace: true })
   }
 
-  // Valor ativo da bottom bar: Início na raiz, Famílias na rota de famílias,
-  // senão "mais" (nenhum destaque forçado) para não acender Início fora dela.
   const currentTab = location.pathname === '/'
     ? 'inicio'
     : location.pathname.startsWith('/familias')

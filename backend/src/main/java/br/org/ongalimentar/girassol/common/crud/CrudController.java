@@ -17,35 +17,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import jakarta.validation.Valid;
 
-/**
- * Controller REST base de CRUD. Uma entidade ganha o CRUD completo apenas
- * estendendo esta classe com {@code @RestController} + {@code @RequestMapping},
- * fornecendo o service e o mapeamento entidade↔DTO.
- *
- * <p>Endpoints: {@code GET /} (paginado/ordenado/filtrado), {@code GET /{id}},
- * {@code POST /}, {@code PUT /{id}}, {@code DELETE /{id}}. Paginação/ordenação vêm
- * do {@link Pageable} (params {@code page}, {@code size}, {@code sort}); o filtro é
- * definido por entidade em {@link #filtro(Map)}.
- *
- * @param <E>   entidade
- * @param <ID>  tipo do id
- * @param <REQ> DTO de entrada (create/update)
- * @param <RES> DTO de saída
- */
 public abstract class CrudController<E, ID, REQ, RES> {
 
 	protected abstract CrudService<E, ID> service();
 
-	/** Cria uma nova entidade a partir do DTO de request. */
 	protected abstract E toEntity(REQ req);
 
-	/** Aplica o DTO de request sobre uma entidade existente (update). */
 	protected abstract void apply(REQ req, E entity);
 
-	/** Converte a entidade no DTO de response. */
 	protected abstract RES toResponse(E entity);
 
-	/** Filtro dinâmico a partir dos query params. Padrão: sem filtro. */
 	protected Specification<E> filtro(Map<String, String> params) {
 		return null;
 	}

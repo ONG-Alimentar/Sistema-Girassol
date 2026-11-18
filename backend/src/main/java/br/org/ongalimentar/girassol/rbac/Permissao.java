@@ -19,14 +19,12 @@ public class Permissao {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	/** Código no formato {@code MODULO:ACAO}, único no catálogo. */
 	@Column(nullable = false, unique = true)
 	private String codigo;
 
 	@ManyToMany(mappedBy = "permissoes")
 	private Set<Cargo> cargos = new HashSet<>();
 
-	/** Exigido pelo JPA. */
 	protected Permissao() {
 	}
 
