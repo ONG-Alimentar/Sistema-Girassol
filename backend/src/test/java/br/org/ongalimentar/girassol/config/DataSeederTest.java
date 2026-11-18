@@ -33,7 +33,7 @@ class DataSeederTest {
 
 	@Test
 	void seedPopulaCatalogoCargosEAdmin() {
-		assertEquals(47, permissaoRepository.count());
+		assertEquals(48, permissaoRepository.count());
 
 		assertTrue(cargoRepository.findByNome("ADMINISTRADOR").isPresent());
 		assertTrue(cargoRepository.findByNome("ASSISTENTE_SOCIAL").isPresent());
