@@ -1,9 +1,3 @@
-/*
- * CSS global mínimo. O reset, o fundo (background.default) e a tipografia base
- * vêm do <CssBaseline/> + tema MUI (src/theme.ts) — a fonte única de estilo.
- * Aqui só garantimos que a app ocupe toda a altura da viewport e o
- * anti-aliasing. Não defina cores/medidas soltas aqui: use tokens do tema.
- */
 html,
 body,
 #root {

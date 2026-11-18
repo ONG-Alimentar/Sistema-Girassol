@@ -20,23 +20,13 @@ import br.org.ongalimentar.girassol.rbac.PermissaoRepository;
 import br.org.ongalimentar.girassol.rbac.Usuario;
 import br.org.ongalimentar.girassol.rbac.UsuarioRepository;
 
-/**
- * Semeia o RBAC (catálogo de permissões, cargos e o mapeamento cargo→permissão)
- * conforme {@code docs/seguranca/rbac.md}. Idempotente: só cria o que falta, então
- * pode rodar a cada startup.
- *
- * <p>Ativo apenas nos profiles {@code dev} e {@code prod} (não nos testes, que
- * montam seus próprios dados). O usuário admin inicial é criado <b>somente</b>
- * quando {@code app.seed.admin=true} (ligado no profile dev) — prod não recebe
- * conta com senha padrão.
- */
+
 @Component
 @Profile({ "dev", "prod" })
 public class DataSeeder implements CommandLineRunner {
 
 	private static final Logger log = LoggerFactory.getLogger(DataSeeder.class);
 
-	/** Catálogo completo de permissões (espelha frontend/src/auth/permissions.ts). */
 	private static final List<String> CATALOGO = List.of(
 			"CONTA:CREATE", "SENHA:UPDATE_SELF",
 			"FAMILIA:READ", "FAMILIA:CREATE", "FAMILIA:UPDATE", "FAMILIA:DELETE",
@@ -53,7 +43,6 @@ public class DataSeeder implements CommandLineRunner {
 			"CARGO:READ", "CARGO:CREATE", "CARGO:UPDATE", "CARGO:DELETE",
 			"PERMISSAO:READ");
 
-	/** Mapeamento cargo → permissões (rbac.md). ADMINISTRADOR recebe tudo. */
 	private static final Map<String, List<String>> CARGOS = cargos();
 
 	private final PermissaoRepository permissaoRepository;
@@ -124,7 +113,6 @@ public class DataSeeder implements CommandLineRunner {
 
 	private static Map<String, List<String>> cargos() {
 		Map<String, List<String>> map = new LinkedHashMap<>();
-		// Administrador: superusuário — todas as permissões do catálogo (inclui sigilo).
 		map.put("ADMINISTRADOR", CATALOGO);
 		map.put("ASSISTENTE_SOCIAL", List.of(
 				"FAMILIA:READ", "FAMILIA:CREATE", "FAMILIA:UPDATE", "FAMILIA:DELETE",

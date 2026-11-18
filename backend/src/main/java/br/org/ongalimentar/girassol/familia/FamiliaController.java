@@ -31,12 +31,6 @@ import br.org.ongalimentar.girassol.familia.dto.EnderecoRequest;
 import br.org.ongalimentar.girassol.familia.dto.DependenteRequest;
 import br.org.ongalimentar.girassol.familia.ServicoRepository;
 
-/**
- * CRUD REST de {@link Familia} — exemplo de reaproveitamento da base genérica
- * ({@link CrudController}). O específico aqui é só o mapeamento DTO↔entidade e um
- * filtro de busca por nome/CPF ({@code ?q=}). Autorização RBAC fica no
- * {@link FamiliaService}.
- */
 @RestController
 @RequestMapping("/api/familias")
 public class FamiliaController extends CrudController<Familia, Long, FamiliaRequest, FamiliaResponse> {
@@ -515,7 +509,6 @@ public class FamiliaController extends CrudController<Familia, Long, FamiliaRequ
 		return FamiliaResponse.from(f);
 	}
 
-	/** Filtro opcional {@code ?q=}: busca por nome ou CPF (case-insensitive). */
 	@Override
 	protected Specification<Familia> filtro(Map<String, String> params) {
 		String q = params.get("q");

@@ -12,12 +12,6 @@ import br.org.ongalimentar.girassol.rbac.Permissao;
 import br.org.ongalimentar.girassol.rbac.Usuario;
 import br.org.ongalimentar.girassol.rbac.UsuarioRepository;
 
-/**
- * Liga o RBAC ao Spring Security: carrega o usuário pelo email e devolve cada
- * permissão (de todos os seus cargos) como {@link SimpleGrantedAuthority}, no
- * formato {@code MODULO:ACAO}. É assim que {@code hasAuthority(...)} funciona nas
- * camadas HTTP e de método (ver {@code docs/seguranca/rbac.md}).
- */
 @Service
 public class AppUserDetailsService implements UserDetailsService {
 

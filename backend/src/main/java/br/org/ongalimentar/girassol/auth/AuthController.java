@@ -22,11 +22,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * Endpoints de autenticação consumidos pelo front (frontend/src/api/auth.ts):
- * {@code POST /api/auth/login}, {@code POST /api/auth/logout} e
- * {@code GET /api/auth/me}. Autenticação por sessão (cookie).
- */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -49,14 +44,12 @@ public class AuthController {
 					UsernamePasswordAuthenticationToken.unauthenticated(
 							credenciais.email(), credenciais.senha()));
 
-			// Rotaciona a sessão no login (prevenção de session fixation).
 			HttpSession sessaoAnterior = request.getSession(false);
 			if (sessaoAnterior != null) {
 				sessaoAnterior.invalidate();
 			}
 			request.getSession(true);
 
-			// Persiste o contexto na sessão → o cookie autentica as próximas chamadas.
 			SecurityContext context = securityContextHolderStrategy.createEmptyContext();
 			context.setAuthentication(authentication);
 			securityContextHolderStrategy.setContext(context);
@@ -80,7 +73,6 @@ public class AuthController {
 
 	@GetMapping("/me")
 	public UsuarioResponse me(Authentication authentication) {
-		// Sem sessão, o SecurityFilterChain já respondeu 401 antes de chegar aqui.
 		return UsuarioResponse.from(authentication);
 	}
 }

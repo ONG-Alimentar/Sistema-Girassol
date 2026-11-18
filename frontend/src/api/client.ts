@@ -1,8 +1,5 @@
-// Base da API, configurável por ambiente (ver .env / VITE_API_URL). Sem barra
-// final para evitar '//' ao concatenar com o path.
 const API_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
 
-/** Erro de API com o status HTTP e o corpo já parseado (quando houver). */
 export class ApiError extends Error {
   readonly status?: number
   readonly body?: unknown
@@ -15,7 +12,6 @@ export class ApiError extends Error {
   }
 }
 
-/** Opções de `apiFetch`: iguais a `fetch`, mas `body` pode ser um objeto. */
 export interface ApiFetchOptions extends Omit<RequestInit, 'body'> {
   body?: BodyInit | object | null
 }
@@ -29,12 +25,6 @@ async function parseBody(response: Response): Promise<unknown> {
   return text || null
 }
 
-/**
- * Faz uma requisição ao backend. `body` é serializado como JSON quando não for
- * string/FormData. Lança {@link ApiError} em respostas não-2xx.
- *
- * @typeParam T  Tipo esperado do corpo da resposta.
- */
 export async function apiFetch<T = unknown>(
   path: string,
   options: ApiFetchOptions = {},
@@ -48,8 +38,6 @@ export async function apiFetch<T = unknown>(
     !(body instanceof FormData)
 
   const response = await fetch(`${API_URL}${path}`, {
-    // Inclui cookies de sessão; compatível com autenticação por cookie no
-    // backend. Se adotarmos JWT no header, isto é inofensivo.
     credentials: 'include',
     headers: {
       Accept: 'application/json',

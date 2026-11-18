@@ -42,7 +42,6 @@ const RENDA_LABELS: Record<string, string> = {
   ACIMA_DE_3_SALARIOS_MINIMOS: 'Acima de 3 salários mínimos',
 }
 
-/** dd/mm/aaaa a partir de uma data ISO (yyyy-mm-dd). */
 function formatDate(value: unknown): string {
   if (typeof value !== 'string' || !value) return '—'
   const parts = value.slice(0, 10).split('-')
@@ -53,7 +52,6 @@ function label(map: Record<string, string>, value: unknown): string {
   return typeof value === 'string' ? (map[value] ?? value) : '—'
 }
 
-/** "rua, numero - bairro, cidade", omitindo partes ausentes. */
 function formatEndereco(e: EnderecoRequest): string {
   const linha = [e.rua, e.numero].filter(Boolean).join(', ')
   const local = [e.bairro, e.cidade].filter(Boolean).join(', ')
@@ -83,8 +81,6 @@ const personalFieldsAfterContact: DetailField<Familia>[] = [
   { field: 'dataCadastro', label: 'Cadastrada em', render: formatDate },
 ]
 
-// Serviços da família exibidos no hub (subconjunto dos módulos; o resto do
-// registro — famílias/documentação/usuários — não é serviço de família).
 const FAMILY_SERVICE_PATHS = ['cestas', 'roupas', 'visitas', 'juridico', 'psicologico']
 
 export function FamiliaDetailPage() {
@@ -107,7 +103,6 @@ export function FamiliaDetailPage() {
         if (ativo) setServicosCatalogo(resultado)
       })
       .catch(() => {
-        // catálogo é só para exibir o nome; sem ele, cai no fallback do id.
       })
     return () => {
       ativo = false

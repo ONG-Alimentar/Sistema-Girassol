@@ -22,28 +22,24 @@ export const theme = createTheme({
     button: { textTransform: 'none', fontWeight: 600 },
   },
   components: {
-    // Botões em formato "pílula", como no wireframe (Entrar, ações).
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
         root: { borderRadius: 999 },
       },
     },
-    // Barra superior em âmbar com texto/ícones marrons (HomeAdmin/BarraLateral).
     MuiAppBar: {
       defaultProps: { elevation: 0, color: 'default' },
       styleOverrides: {
         root: { backgroundColor: AMBER, color: BROWN_DARK },
       },
     },
-    // Superfícies em creme, com cantos arredondados do tema.
     MuiCard: {
       defaultProps: { elevation: 0 },
       styleOverrides: {
         root: { backgroundColor: CREAM_PAPER, border: `1px solid ${AMBER}33` },
       },
     },
-    // Campos arredondados e com fundo "paper", como no wireframe.
     MuiTextField: {
       defaultProps: { variant: 'outlined', fullWidth: true },
     },

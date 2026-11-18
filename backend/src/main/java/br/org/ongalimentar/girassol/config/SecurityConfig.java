@@ -35,13 +35,10 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 						.requestMatchers("/actuator/health").permitAll()
 						.anyRequest().authenticated())
-				// Sem sessão → 401 (e não o 403 padrão), para o /me do front distinguir
-				// "não autenticado" de "autenticado sem permissão".
 				.exceptionHandling(ex -> ex
 						.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
 				.formLogin(form -> form.disable())
 				.httpBasic(basic -> basic.disable())
-				// Logout é tratado no AuthController (invalida a sessão).
 				.logout(logout -> logout.disable());
 		return http.build();
 	}

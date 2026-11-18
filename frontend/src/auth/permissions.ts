@@ -1,6 +1,3 @@
-// Catálogo de permissões do RBAC (docs/seguranca/rbac.md), no formato
-// MODULO:ACAO. Tipar como união literal faz o compilador recusar códigos
-// inexistentes em guards, rotas e UI condicional.
 export type Permission =
   | 'CONTA:CREATE'
   | 'SENHA:UPDATE_SELF'
@@ -18,10 +15,6 @@ export type Permission =
   | 'CARGO:READ' | 'CARGO:CREATE' | 'CARGO:UPDATE' | 'CARGO:DELETE'
   | 'PERMISSAO:READ'
 
-/**
- * Indica se a lista de permissões concede a(s) permissão(ões) exigida(s).
- * Com uma lista em `required`, basta UMA (semântica OR).
- */
 export function hasPermission(
   granted: Permission[] | undefined,
   required: Permission | Permission[],

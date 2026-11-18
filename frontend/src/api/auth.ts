@@ -10,9 +10,7 @@ export interface Usuario {
   id: number
   email: string
   nome?: string
-  /** Autoridades concedidas, no formato MODULO:ACAO. */
   permissions: Permission[]
-  /** Nomes dos cargos do usuário (ex.: ADMINISTRADOR), para a saudação por cargo. */
   cargos?: string[]
 }
 
@@ -24,10 +22,6 @@ export function logout(): Promise<unknown> {
   return apiFetch('/api/auth/logout', { method: 'POST' })
 }
 
-/**
- * Retorna o usuário autenticado e suas permissões, ou null se não houver
- * sessão (backend responde 401).
- */
 export async function me(): Promise<Usuario | null> {
   try {
     return await apiFetch<Usuario>('/api/auth/me')

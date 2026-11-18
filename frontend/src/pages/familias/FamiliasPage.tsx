@@ -8,7 +8,6 @@ import { useAuth } from '../../auth/useAuth'
 import { EmptyState } from '../../components/common/EmptyState'
 import { PaginatedList, type ListColumn, type ListFilter } from '../../components/common/PaginatedList'
 
-/** dd/mm/aaaa a partir de uma data ISO (yyyy-mm-dd, com ou sem hora). */
 function formatDate(value: string | null): string {
   if (!value) return 'Não informada'
   const parts = value.slice(0, 10).split('-')

@@ -57,7 +57,6 @@ public class FamiliaService extends CrudService<Familia, Long> {
 		super.excluir(id);
 	}
 
-	/** Toca as coleções lazy para materializá-las antes de a transação fechar. */
 	private static void inicializarColecoes(Familia familia) {
 		familia.getTelefones().size();
 		familia.getEnderecos().size();

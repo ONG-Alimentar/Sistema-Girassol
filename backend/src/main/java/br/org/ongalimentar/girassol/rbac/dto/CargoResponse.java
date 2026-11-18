@@ -5,11 +5,6 @@ import java.util.List;
 
 import br.org.ongalimentar.girassol.rbac.Cargo;
 
-/**
- * DTO de saída de um {@link Cargo}, com suas permissões (ordenadas por código) e
- * a contagem de usuários vinculados. As coleções devem estar inicializadas pelo
- * service antes da conversão ({@code open-in-view=false}).
- */
 public record CargoResponse(Long id, String nome, List<PermissaoResponse> permissoes, int totalUsuarios) {
 
 	public static CargoResponse from(Cargo c) {

@@ -27,7 +27,6 @@ public class Usuario {
 	@Column(nullable = false, unique = true)
 	private String email;
 
-	/** Hash BCrypt da senha — nunca o texto puro. */
 	@Column(name = "senha_hash", nullable = false)
 	private String senhaHash;
 
@@ -41,7 +40,6 @@ public class Usuario {
 			inverseJoinColumns = @JoinColumn(name = "cargo_id"))
 	private Set<Cargo> cargos = new HashSet<>();
 
-	/** Exigido pelo JPA. */
 	protected Usuario() {
 	}
 
@@ -51,7 +49,6 @@ public class Usuario {
 		this.senhaHash = senhaHash;
 	}
 
-	/** Vincula um cargo a este usuário, mantendo os dois lados da relação. */
 	public void adicionarCargo(Cargo cargo) {
 		cargos.add(cargo);
 		cargo.getUsuarios().add(this);

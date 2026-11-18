@@ -20,8 +20,6 @@ import { SunflowerLogo } from '../components/brand/SunflowerLogo.tsx'
 import { useAuth } from '../auth/useAuth.ts'
 import { useToast } from '../hooks/useToast.ts'
 
-/** Tela de login (wireframe Login.png). Após autenticar, volta para a rota de
- *  origem (ou a home). Erros são mostrados via toast. */
 export function LoginPage() {
   const { login } = useAuth()
   const { showToast } = useToast()

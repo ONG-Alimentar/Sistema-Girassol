@@ -7,7 +7,6 @@ import br.org.ongalimentar.girassol.rbac.Usuario;
 
 public record UsuarioAdminResponse(Long id, String nome, String email, boolean ativo, List<CargoResumo> cargos) {
 
-	/** Resumo do cargo para listar/exibir no usuário (sem as permissões). */
 	public record CargoResumo(Long id, String nome) {
 	}
 

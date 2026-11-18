@@ -6,7 +6,6 @@ import { App } from '../../App'
 import { AuthContext } from '../../auth/auth-context.ts'
 import { FamiliasPage } from './FamiliasPage'
 
-/** Stub de auth sem rede, para testes que não exercitam permissões (useAuth só decide o botão "Nova família"). */
 function AuthStub({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider

@@ -15,12 +15,6 @@ import br.org.ongalimentar.girassol.common.crud.CrudService;
 import br.org.ongalimentar.girassol.rbac.dto.CargoRequest;
 import br.org.ongalimentar.girassol.rbac.dto.CargoResponse;
 
-/**
- * CRUD REST de {@link Cargo} sobre a base genérica ({@link CrudController}). O
- * específico é o mapeamento DTO↔entidade — incluindo a resolução dos
- * {@code permissaoIds} em entidades {@link Permissao} — e o filtro {@code ?q=} por
- * nome. Autorização RBAC fica no {@link CargoService}.
- */
 @RestController
 @RequestMapping("/api/cargos")
 public class CargoController extends CrudController<Cargo, Long, CargoRequest, CargoResponse> {
@@ -48,8 +42,6 @@ public class CargoController extends CrudController<Cargo, Long, CargoRequest, C
 	@Override
 	protected void apply(CargoRequest req, Cargo cargo) {
 		cargo.setNome(req.nome());
-		// O Cargo é o dono de cargo_permissao: sincronizar o lado dono já reflete
-		// o vínculo no banco. Resolver cada id valida a existência (400 se inválido).
 		cargo.getPermissoes().clear();
 		cargo.getPermissoes().addAll(resolverPermissoes(req.permissaoIds()));
 	}
@@ -59,7 +51,6 @@ public class CargoController extends CrudController<Cargo, Long, CargoRequest, C
 		return CargoResponse.from(cargo);
 	}
 
-	/** Filtro opcional {@code ?q=}: busca por nome (case-insensitive). */
 	@Override
 	protected Specification<Cargo> filtro(Map<String, String> params) {
 		String q = params.get("q");

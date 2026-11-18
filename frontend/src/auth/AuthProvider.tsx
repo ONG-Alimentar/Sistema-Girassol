@@ -7,10 +7,6 @@ import type { AuthValue } from './auth-context.ts'
 import { hasPermission } from './permissions.ts'
 import type { Permission } from './permissions.ts'
 
-/**
- * Provedor de autenticação. No boot, tenta restaurar a sessão via /auth/me e
- * expõe usuário, permissões e as ações de login/logout para toda a árvore.
- */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Usuario | null>(null)
   const [loading, setLoading] = useState(true)

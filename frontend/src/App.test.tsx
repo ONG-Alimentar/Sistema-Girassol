@@ -2,13 +2,6 @@ import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App.tsx'
 
-/**
- * Guarda de regressão do roteamento em produção (GitHub Pages, subpath
- * /Sistema-Girassol/): BrowserRouter sem basename ou AuthProvider não montado
- * faziam o app cair sempre na NotFoundPage e nunca chamar o backend. Roda com
- * basename = import.meta.env.BASE_URL, fixado em '/Sistema-Girassol/' pelo
- * vitest.config (igual ao build de prod).
- */
 describe('App — roteamento no subpath de produção', () => {
   beforeEach(() => {
     vi.stubEnv('BASE_URL', '/Sistema-Girassol/')

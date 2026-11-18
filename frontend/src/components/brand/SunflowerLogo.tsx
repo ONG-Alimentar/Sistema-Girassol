@@ -1,10 +1,5 @@
 import { useId } from 'react'
 
-/**
- * Logo do Sistema Girassol (girassol estilizado dos wireframes): pétalas
- * amarelas em volta de um miolo marrom. SVG puro para escalar sem perda e
- * herdar as cores da identidade.
- */
 export function SunflowerLogo({ size = 96, title = 'Sistema Girassol' }: { size?: number; title?: string }) {
   const PETALS = 16
   const PETAL = '#F2B705'
@@ -29,9 +24,6 @@ export function SunflowerLogo({ size = 96, title = 'Sistema Girassol' }: { size?
         </filter>
       </defs>
       <g transform="translate(50 50)">
-        {/* Halo branco (fiel ao wireframe): cópia maior de cada pétala/miolo
-            desenhada atrás das formas reais, sobrando como contorno — destaca
-            o girassol mesmo sobre o fundo amarelo do header. */}
         {Array.from({ length: PETALS }).map((_, i) => (
           <ellipse
             key={`halo-${i}`}
@@ -59,7 +51,6 @@ export function SunflowerLogo({ size = 96, title = 'Sistema Girassol' }: { size?
           />
         ))}
 
-        {/* Glow branco atrás do miolo, suavizado por blur — destaca o centro. */}
         <circle cx="0" cy="0" r="20" fill={HALO} filter={`url(#${glowId})`} />
         <circle cx="0" cy="0" r="18" fill={CENTER} />
       </g>

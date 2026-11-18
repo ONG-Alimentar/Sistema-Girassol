@@ -11,7 +11,6 @@ public record ApiError(
 		String path,
 		List<FieldError> fieldErrors) {
 
-	/** Erro associado a um campo específico (validação). */
 	public record FieldError(String field, String message) {
 	}
 }
