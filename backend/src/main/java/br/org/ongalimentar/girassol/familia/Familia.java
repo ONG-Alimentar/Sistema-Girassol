@@ -2,6 +2,8 @@ package br.org.ongalimentar.girassol.familia;
 
 import br.org.ongalimentar.girassol.doacaocesta.DoacaoCesta;
 import br.org.ongalimentar.girassol.doacaoroupa.DoacaoRoupa;
+import br.org.ongalimentar.girassol.atendimento.AtendimentoPsicologico;
+import br.org.ongalimentar.girassol.atendimento.AtendimentoJuridico;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -92,6 +94,12 @@ public class Familia {
 
 	@OneToMany(mappedBy = "familia", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DoacaoRoupa> doacoesRoupas = new ArrayList<>();
+
+	@OneToMany(mappedBy = "responsavelFamilia", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<AtendimentoJuridico> atendimentosJuridicos = new ArrayList<>();
+
+	@OneToMany(mappedBy = "responsavelFamilia", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<AtendimentoPsicologico> atendimentosPsicologicos = new ArrayList<>();
 
 	public Familia() {
 	}
@@ -354,6 +362,36 @@ public class Familia {
 	public void removeDoacaoCesta(DoacaoCesta doacaoCesta) {
 		if (doacoesCestas.remove(doacaoCesta)) {
 			doacaoCesta.setFamilia(null);
+		}
+	}
+
+	public List<AtendimentoJuridico> getAtendimentosJuridicos() {
+		return atendimentosJuridicos;
+	}
+
+	public void addAtendimentoJuridico(AtendimentoJuridico atendimentoJuridico) {
+		atendimentosJuridicos.add(atendimentoJuridico);
+		atendimentoJuridico.setResponsavelFamilia(this);
+	}
+
+	public void removeAtendimentoJuridico(AtendimentoJuridico atendimentoJuridico) {
+		if (atendimentosJuridicos.remove(atendimentoJuridico)) {
+			atendimentoJuridico.setResponsavelFamilia(null);
+		}
+	}
+
+	public List<AtendimentoPsicologico> getAtendimentosPsicologicos() {
+		return atendimentosPsicologicos;
+	}
+
+	public void addAtendimentoPsicologico(AtendimentoPsicologico atendimentoPsicologico) {
+		atendimentosPsicologicos.add(atendimentoPsicologico);
+		atendimentoPsicologico.setResponsavelFamilia(this);
+	}
+
+	public void removeAtendimentoPsicologico(AtendimentoPsicologico atendimentoPsicologico) {
+		if (atendimentosPsicologicos.remove(atendimentoPsicologico)) {
+			atendimentoPsicologico.setResponsavelFamilia(null);
 		}
 	}
 }
