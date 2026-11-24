@@ -24,6 +24,14 @@ services:
         sync: false
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      # Envio de email (recuperação de senha via OTP) — conta Brevo, preencher
+      # no painel do Render (Environment). Ver docs/deploy/README.md.
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+      - key: APP_EMAIL_REMETENTE
+        sync: false
       # Limita o heap da JVM ao plano free (512MB).
       - key: JAVA_TOOL_OPTIONS
         value: -XX:MaxRAMPercentage=75

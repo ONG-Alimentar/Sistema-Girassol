@@ -30,3 +30,22 @@ export async function me(): Promise<Usuario | null> {
     throw error
   }
 }
+
+export function solicitarRecuperacaoSenha(email: string): Promise<unknown> {
+  return apiFetch('/api/auth/recuperacao-senha/solicitar', { method: 'POST', body: { email } })
+}
+
+export function validarCodigoRecuperacao(email: string, codigo: string): Promise<unknown> {
+  return apiFetch('/api/auth/recuperacao-senha/validar', { method: 'POST', body: { email, codigo } })
+}
+
+export interface RedefinirSenhaPayload {
+  email: string
+  codigo: string
+  novaSenha: string
+  confirmarSenha: string
+}
+
+export function redefinirSenha(payload: RedefinirSenhaPayload): Promise<unknown> {
+  return apiFetch('/api/auth/recuperacao-senha/redefinir', { method: 'POST', body: payload })
+}
