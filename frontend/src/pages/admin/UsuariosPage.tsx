@@ -1,6 +1,8 @@
-import { Chip, Stack, Typography } from '@mui/material'
+import { Button, Chip, Stack, Typography } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 import { useNavigate } from 'react-router-dom'
 import type { UsuarioListItem } from '../../api/usuarios'
+import { useAuth } from '../../auth/useAuth'
 import { EmptyState } from '../../components/common/EmptyState'
 import { PaginatedList, type ListColumn, type ListFilter } from '../../components/common/PaginatedList'
 
@@ -46,11 +48,23 @@ const filters: ListFilter[] = [{
 
 export function UsuariosPage() {
   const navigate = useNavigate()
+  const { can } = useAuth()
   return (
     <Stack spacing={3} sx={{ width: '100%', minWidth: 0 }}>
-      <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
-        Usuários
-      </Typography>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
+          Usuários
+        </Typography>
+        {can('USUARIO:CREATE') && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/admin/usuarios/novo')}
+          >
+            Novo usuário
+          </Button>
+        )}
+      </Stack>
       <PaginatedList<UsuarioListItem>
         endpoint="/api/usuarios"
         columns={columns}

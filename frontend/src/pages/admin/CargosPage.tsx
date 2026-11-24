@@ -1,6 +1,8 @@
-import { Chip, Stack, Typography } from '@mui/material'
+import { Button, Chip, Stack, Typography } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
 import { useNavigate } from 'react-router-dom'
 import type { CargoListItem } from '../../api/cargos'
+import { useAuth } from '../../auth/useAuth'
 import { EmptyState } from '../../components/common/EmptyState'
 import { PaginatedList, type ListColumn, type ListFilter } from '../../components/common/PaginatedList'
 
@@ -40,11 +42,23 @@ const filters: ListFilter[] = [{
 
 export function CargosPage() {
   const navigate = useNavigate()
+  const { can } = useAuth()
   return (
     <Stack spacing={3} sx={{ width: '100%', minWidth: 0 }}>
-      <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
-        Cargos
-      </Typography>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
+          Cargos
+        </Typography>
+        {can('CARGO:CREATE') && (
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/admin/cargos/novo')}
+          >
+            Novo cargo
+          </Button>
+        )}
+      </Stack>
       <PaginatedList<CargoListItem>
         endpoint="/api/cargos"
         columns={columns}
