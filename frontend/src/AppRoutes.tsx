@@ -12,7 +12,9 @@ import { ForbiddenPage } from './pages/ForbiddenPage.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
 import { ModulePlaceholder } from './pages/ModulePlaceholder.tsx'
 import { UsuarioDetailPage } from './pages/admin/UsuarioDetailPage'
+import { UsuarioFormPage } from './pages/admin/UsuarioFormPage'
 import { CargoDetailPage } from './pages/admin/CargoDetailPage'
+import { CargoFormPage } from './pages/admin/CargoFormPage'
 import { PermissaoDetailPage } from './pages/admin/PermissaoDetailPage'
 import { FamiliaDetailPage } from './pages/familias/FamiliaDetailPage.tsx'
 import { CestaDetailPage } from './pages/cestas/CestaDetailPage'
@@ -67,6 +69,40 @@ export function AppRoutes() {
             element={
               <PermissionGuard permission="FAMILIA:READ" redirect>
                 <FamiliaDetailPage />
+              </PermissionGuard>
+            }
+          />
+          {/* Administração RBAC (#3): criação e edição de Usuário e Cargo.
+              A listagem e o detalhe vêm do registro de MÓDULOS / ADMIN_DETAIL_ROUTES abaixo. */}
+          <Route
+            path="admin/usuarios/novo"
+            element={
+              <PermissionGuard permission="USUARIO:CREATE" redirect>
+                <UsuarioFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="admin/usuarios/:id/editar"
+            element={
+              <PermissionGuard permission="USUARIO:UPDATE" redirect>
+                <UsuarioFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="admin/cargos/novo"
+            element={
+              <PermissionGuard permission="CARGO:CREATE" redirect>
+                <CargoFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="admin/cargos/:id/editar"
+            element={
+              <PermissionGuard permission="CARGO:UPDATE" redirect>
+                <CargoFormPage />
               </PermissionGuard>
             }
           />
