@@ -138,7 +138,7 @@ export function LoginPage() {
               component="button"
               type="button"
               underline="hover"
-              onClick={() => showToast('Recuperação de senha em breve.', 'info')}
+              onClick={() => navigate('/recuperar-senha')}
               sx={{ color: 'text.secondary', alignSelf: 'center', fontWeight: 600 }}
             >
               Esqueceu sua senha?

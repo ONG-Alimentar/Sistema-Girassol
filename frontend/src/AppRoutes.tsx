@@ -10,6 +10,7 @@ import { AppLayout } from './layouts/AppLayout.tsx'
 import { DashboardPage } from './pages/DashboardPage.tsx'
 import { ForbiddenPage } from './pages/ForbiddenPage.tsx'
 import { LoginPage } from './pages/LoginPage.tsx'
+import { RecuperarSenhaPage } from './pages/RecuperarSenhaPage.tsx'
 import { ModulePlaceholder } from './pages/ModulePlaceholder.tsx'
 import { UsuarioDetailPage } from './pages/admin/UsuarioDetailPage'
 import { UsuarioFormPage } from './pages/admin/UsuarioFormPage'
@@ -38,6 +39,7 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
       <Route element={<RequireAuth />}>
         {import.meta.env.DEV && (
           <>

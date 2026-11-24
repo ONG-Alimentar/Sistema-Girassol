@@ -11,6 +11,8 @@ public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
 
 	boolean existsByEmail(String email);
 
+	Optional<Usuario> findByEmail(String email);
+
 	@Query("""
 			select distinct u from Usuario u
 			left join fetch u.cargos c
