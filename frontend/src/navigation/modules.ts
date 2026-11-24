@@ -14,6 +14,7 @@ import Key from '@mui/icons-material/Key'
 import type { Permission } from '../auth/permissions.ts'
 import { FamiliasPage } from '../pages/familias/FamiliasPage'
 import { CestasPage } from '../pages/cestas/CestasPage'
+import { RoupasPage } from '../pages/roupas/RoupasPage'
 import { UsuariosPage } from '../pages/admin/UsuariosPage'
 import { CargosPage } from '../pages/admin/CargosPage'
 import { PermissoesPage } from '../pages/admin/PermissoesPage'
@@ -29,7 +30,7 @@ export interface ModuleDef {
 export const MODULES: ModuleDef[] = [
   { path: 'familias', label: 'Famílias', permission: 'FAMILIA:READ', icon: Groups, component: FamiliasPage },
   { path: 'cestas', label: 'Cestas básicas', permission: 'CESTA:READ', icon: ShoppingBasket, component: CestasPage },
-  { path: 'roupas', label: 'Doação de roupas', permission: 'ROUPA:READ', icon: Checkroom },
+  { path: 'roupas', label: 'Doação de roupas', permission: 'ROUPA:READ', icon: Checkroom, component: RoupasPage },
   { path: 'visitas', label: 'Registro de visitas', permission: 'VISITA:READ', icon: EventNote },
   { path: 'juridico', label: 'Jurídico', permission: 'JURIDICO:READ', icon: Gavel },
   { path: 'psicologico', label: 'Psicológico', permission: 'PSICOLOGICO:READ', icon: Psychology },

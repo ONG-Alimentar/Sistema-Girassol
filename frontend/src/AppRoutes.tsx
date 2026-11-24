@@ -17,6 +17,8 @@ import { PermissaoDetailPage } from './pages/admin/PermissaoDetailPage'
 import { FamiliaDetailPage } from './pages/familias/FamiliaDetailPage.tsx'
 import { CestaDetailPage } from './pages/cestas/CestaDetailPage'
 import { CestaFormPage } from './pages/cestas/CestaFormPage'
+import { RoupaDetailPage } from './pages/roupas/RoupaDetailPage'
+import { RoupaFormPage } from './pages/roupas/RoupaFormPage'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { FamiliaFormPage } from './pages/FamiliaFormPage';
 
@@ -91,6 +93,25 @@ export function AppRoutes() {
             element={
               <PermissionGuard permission="CESTA:READ" redirect>
                 <CestaDetailPage />
+              </PermissionGuard>
+            }
+          />
+          {/* Doações de roupa (#7): criação e detalhe. Sem edição — não há
+              ROUPA:UPDATE no RBAC atual. A listagem /roupas vem do registro
+              de MÓDULOS abaixo (component). */}
+          <Route
+            path="roupas/novo"
+            element={
+              <PermissionGuard permission="ROUPA:CREATE" redirect>
+                <RoupaFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="roupas/:id"
+            element={
+              <PermissionGuard permission="ROUPA:READ" redirect>
+                <RoupaDetailPage />
               </PermissionGuard>
             }
           />
