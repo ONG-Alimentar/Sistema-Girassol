@@ -21,6 +21,9 @@ import { CestaDetailPage } from './pages/cestas/CestaDetailPage'
 import { CestaFormPage } from './pages/cestas/CestaFormPage'
 import { RoupaDetailPage } from './pages/roupas/RoupaDetailPage'
 import { RoupaFormPage } from './pages/roupas/RoupaFormPage'
+import { VisitasPage } from './pages/visitas/VisitasPage'
+import { VisitaDetailPage } from './pages/visitas/VisitaDetailPage'
+import { VisitaFormPage } from './pages/visitas/VisitaFormPage'
 import { NotFoundPage } from './pages/NotFoundPage.tsx'
 import { FamiliaFormPage } from './pages/FamiliaFormPage';
 
@@ -151,6 +154,27 @@ export function AppRoutes() {
               </PermissionGuard>
             }
           />
+          <Route
+            path="visitas/listagem"
+            element={
+              <PermissionGuard permission="VISITA:READ" redirect>
+                <VisitasPage />
+              </PermissionGuard>
+            }
+          />
+          <Route
+            path="visitas/nova"
+            element={
+              <PermissionGuard permission="VISITA:CREATE" redirect>
+                <VisitaFormPage />
+              </PermissionGuard>
+            }
+          />
+          <Route path="visitas/:id" element={
+            <PermissionGuard permission="VISITA:READ" redirect>
+              <VisitaDetailPage />
+            </PermissionGuard>
+          } />
           {MODULES.map((m) => {
             const Page = m.component
             return (
