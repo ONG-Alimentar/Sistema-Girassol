@@ -147,11 +147,12 @@ classDiagram
     %% ===================== Voluntário externo (dado, não ator) =====================
     class VoluntarioExterno {
         +Long id
-        +String nome
-        +String telefone
+        +String nomeCompleto
+        +String contato
         +String frequencia
-        +String areaAtuacao
         +boolean ativo
+        +String atividadesDesenvolvidas
+        +String areaAtuacao
     }
 
     %% ===================== Enumerações =====================
@@ -200,7 +201,7 @@ e precisa de validação do grupo (ou remoção, se a entrega exigir fidelidade 
 | **DoacaoRoupa** | data, quantidadePecas, itens opcionais *(txt 3e)* | — |
 | **Visita** | nomeVisitante, data, horario, voluntário, servicoSolicitado *(txt 3f)* | — |
 | **Documento** | nome/tipo, arquivo *(txt 3g)* | dataUpload |
-| **VoluntarioExterno** | frequencia, ativo *(txt 3h)*, areaAtuacao *(svg extend)* | nome, telefone |
+| **VoluntarioExterno** | frequencia, ativo *(txt 3h)*, nomeCompleto, contato, atividadesDesenvolvidas *(wireframes 77–81)*, areaAtuacao *(svg extend)* | — |
 
 > A maior parte dos atributos de **Familia**, **Dependente** e **Atendimento** é `inf`:
 > as fontes canônicas não os enumeram. A enumeração anterior vinha do
